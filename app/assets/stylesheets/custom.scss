@@ -2,7 +2,6 @@
 @import "bootstrap";
 
 /* universal */
-
 body {
   padding-top: 60px;
 }
@@ -24,7 +23,6 @@ textarea {
 }
 
 /* typography */
-
 h1, h2, h3, h4, h5, h6 {
   line-height: 1;
 }
@@ -51,7 +49,6 @@ p {
 }
 
 /* header */
-
 #logo {
   float: left;
   margin-right: 10px;
@@ -66,4 +63,32 @@ p {
 #logo:hover {
   color: #fff;
   text-decoration: none;
+}
+
+/* debug */
+.debug_dump {
+  clear: both;
+  float: left;
+  width: 100%;
+  margin-top: 45px;
+  -moz-box-sizing:    border-box;
+  -webkit-box-sizing: border-box;
+  box-sizing:         border-box;
+}
+
+/* error_messages */
+#error_explanation {
+  color: red;
+  ul {
+    color: red;
+    margin: 0 0 30px 0;
+  }
+}
+
+/* エラー対象のテキストフィールドの枠を赤にします。 */
+.field_with_errors {
+  @extend .has-error;
+  .form-control {
+    color: $state-danger-text;
+  }
 }
