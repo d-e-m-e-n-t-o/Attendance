@@ -85,10 +85,19 @@ p {
   }
 }
 
-/* エラー対象のテキストフィールドの枠を赤にします。 */
+/* error_text_field */
 .field_with_errors {
   @extend .has-error;
   .form-control {
     color: $state-danger-text;
   }
+}
+
+/* Login_form */
+.label-login {
+  margin-top: 5px;
+}
+
+.btn-login {
+  margin-top: 10px;
 }
