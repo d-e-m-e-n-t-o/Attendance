@@ -2,8 +2,7 @@
 // They will automatically be included in application.css.
 // You can use Sass (SCSS) here: http://sass-lang.com/
 
-/* ユーザー情報テーブル */
-
+/* User_details */
 .user-table {
   vertical-align: middle;
   text-align: center;
@@ -15,4 +14,28 @@
 
 .btn-signup {
   margin-top: 10px;
+}
+
+/* User_information_edit_form */
+.label-signup {
+  margin-top: 5px;
+}
+
+.btn-signup {
+  margin-top: 10px;
+}
+
+.label-user--edit {
+  margin-top: 5px;
+}
+
+.btn-user--edit {
+  margin-top: 10px;
+}
+
+/* User_list */
+#table-users {
+  td {
+    vertical-align: middle;
+  }  
 }
