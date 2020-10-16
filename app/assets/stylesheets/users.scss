@@ -8,12 +8,16 @@
   text-align: center;
 }
 
-.label-signup {
-  margin-top: 5px;
-}
-
-.btn-signup {
-  margin-top: 10px;
+/* User_attendance_information_table */
+#table-attendances {
+  th {
+    vertical-align: middle;
+    text-align: center;
+  }
+  td {
+    vertical-align: middle;
+    text-align: center;
+  }
 }
 
 /* User_information_edit_form */
@@ -38,4 +42,23 @@
   td {
     vertical-align: middle;
   }  
+}
+
+/* modal_window_Basic_information_editing */
+.label-basic-info {
+  margin-top: 5px;
+}
+
+.btn-basic-info {
+  margin: 15px 0;
+  width: 30%;
+}
+
+/* Day_of_the_week_color_change */
+.wday0 {
+  color: red;
+}
+
+.wday6 {
+  color: blue;
 }
