@@ -19,4 +19,33 @@ class ApplicationController < ActionController::Base
     flash[:danger] = "ページ情報の取得に失敗しました、再アクセスしてください。"
     redirect_to root_url
   end
+  
+    # ↓ before_action_filter ↓
+    def set_user
+      @user = User.find(params[:id])
+    end
+    
+    # ユーザーがログイン済みか確認
+    def logged_in_user
+      unless logged_in?
+        store_location
+        flash[:danger] = "ログインしてください。"
+        redirect_to login_url
+      end
+    end
+    
+    # アクセスしたユーザーが現在ログイン中か確認
+    def correct_user
+      redirect_to(root_url) unless current_user?(@user)
+    end
+    
+    # 管理権限者を許可
+    def admin_user
+      redirect_to root_url unless current_user.admin?
+    end
+    
+    # 上長権限者を許可
+    def superior_user
+      redirect_to root_url unless current_user.superior?
+    end
 end
