@@ -1,5 +1,5 @@
 class UsersController < ApplicationController
-  before_action :set_user, only: [:show, :edit, :update, :destroy, :edit_basic_info, :update_basic_info]
+  before_action :set_user, only: [:show, :edit, :update, :destroy, :edit_basic_info, :update_basic_info, :update_overtime_application]
   before_action :logged_in_user, only: [:show, :edit, :update, :index, :destroy, :edit_basic_info, :update_basic_info]
   before_action :correct_user, only: [:edit, :update]
   before_action :admin_user, only: [:destroy, :edit_basic_info, :update_basic_info]
@@ -11,6 +11,8 @@ class UsersController < ApplicationController
   
   def show
     @worked_sum = @attendances.where.not(started_at: nil).count
+    @superiors = User.where(superior: true).where.not(id: @user.id)
+    @applying = Attendance.find_by(worked_on: @first_day)
   end
   
   def create
@@ -37,7 +39,7 @@ class UsersController < ApplicationController
   end
   
   def index
-    @users = params[:search].present? ? 
+    @users = params[:search].present? ?
     User.where('name LIKE ?', "%#{params[:search]}%").paginate(page: params[:page]) :
     User.paginate(page: params[:page])
   end
@@ -63,11 +65,11 @@ class UsersController < ApplicationController
   private
   
     def user_params
-      params.require(:user).permit(:name, :email, :department, :password, :password_confirmation)
+      params.require(:user).permit(:name, :email, :affiliation, :password, :password_confirmation)
     end
     
     def basic_info_params
-      params.require(:user).permit(:department, :basic_time, :work_time)
+      params.require(:user).permit(:affiliation, :basic_time, :work_time)
     end
 end
 

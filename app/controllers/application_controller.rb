@@ -25,6 +25,14 @@ class ApplicationController < ActionController::Base
       @user = User.find(params[:id])
     end
     
+    def set_user_attendance
+      @user = User.find(params[:user_id])
+    end
+    
+    def set_attendance
+      @attendance = Attendance.find(params[:id])
+    end
+    
     # ユーザーがログイン済みか確認
     def logged_in_user
       unless logged_in?
@@ -34,6 +42,15 @@ class ApplicationController < ActionController::Base
       end
     end
     
+    # 管理権限者、または現在ログインしているユーザーを許可
+    def admin_or_correct_user
+      @user = User.find(params[:user_id]) if @user.blank?
+      unless current_user?(@user) || current_user.admin?
+        flash[:danger] = "編集権限がありません。"
+        redirect_to(root_url)
+      end  
+    end
+
     # アクセスしたユーザーが現在ログイン中か確認
     def correct_user
       redirect_to(root_url) unless current_user?(@user)

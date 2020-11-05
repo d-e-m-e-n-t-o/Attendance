@@ -1,0 +1,53 @@
+<% provide(:class_text, 'overtime-application') %>
+<% provide(:button_text, '変更を送信する') %>
+
+<div class="modal-dialog modal-lg modal-dialog-center">
+  <div class="modal-content">
+    <div class="modal-header">
+      <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+      <h1 class="modal-title">【残業申請】</h1>
+    </div>
+    <div class="modal-body">
+      <div class="row">
+        <div class="col-md-10 col-md-offset-1">
+          <%= form_with(model: @user, url: update_overtime_apply_user_attendance_path(@user, @attendance), local: true, method: :patch) do |f| %>
+            <table class="table table-bordered table-condensed table-hover" id="table-attendances">
+              <thead>
+                <tr>
+                  <th>日付</th>
+                  <th>曜日</th>
+                  <th>終了予定時間</th>
+                  <th>翌日</th>
+                  <th>業務処理内容</th>
+                  <th>指示書確認㊞</th>
+                </tr>
+              </thead>
+          
+              <tbody>
+                <%= f.fields_for :attendances, @attendance do |attendance|%>
+                  <%= render 'shared/error_messages', object: @user %>
+                  <td><%= l(@attendance.worked_on, format: :short) %></td>
+                  <td class='<%= "wday#{@attendance.worked_on.wday}"%>'>
+                    <%= $days_of_the_week[@attendance.worked_on.wday] %>
+                  </td>
+                  <td><%= attendance.time_field :scheduled_end_time, class: "form-control" %></td>
+                  <td><%= attendance.check_box :check_overtime_apply, id: "remember-me" %></td>
+                  <td><%= attendance.text_field :business_content, class: "form-control" %></td>
+                  <td><%= attendance.collection_select(:directions, @superiors, :name, :name, prompt: "選択してください", class: 'form-control') %></td>
+                <% end %>
+              </tbody>
+            </table>
+            <div class="center fixed-bottom">
+              <%= f.submit yield(:button_text), class: "btn btn-primary btn-#{yield(:class_text)}" %>
+              <button type="button" class="btn btn-default btn-<%= yield(:class_text) %>" data-dismiss="modal">
+                キャンセル
+              </button>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
