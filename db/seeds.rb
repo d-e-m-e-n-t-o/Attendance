@@ -8,41 +8,41 @@
 
 # coding: utf-8
 
-User.create!(name: "Sample superiorA",
+User.create!(name: "上長A",
              email: "sample@email.com",
              password: "password",
              password_confirmation: "password",
              employee_number: "1",
              superior: true)
              
-User.create!(name: "Sample superiorB",
+User.create!(name: "上長B",
              email: "sample-1@email.com",
              password: "password",
              password_confirmation: "password",
              employee_number: "2",
              superior: true)
              
-User.create!(name: "Sample superiorC",
+User.create!(name: "上長C",
              email: "sample-2@email.com",
              password: "password",
              password_confirmation: "password",
              employee_number: "3",
              superior: true)
              
-User.create!(name: "Sample adminA",
+User.create!(name: "管理者A",
              email: "sample-3@email.com",
              password: "password",
              password_confirmation: "password",
              employee_number: "4",
              admin: true)
 
-User.create!(name: "Sample adminB",
+User.create!(name: "管理者B",
              email: "sample-4@email.com",
              password: "password",
              password_confirmation: "password",
              admin: true)
              
-User.create!(name: "Sample adminC",
+User.create!(name: "管理者C",
              email: "sample-5@email.com",
              password: "password",
              password_confirmation: "password",

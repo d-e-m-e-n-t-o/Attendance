@@ -1,6 +1,6 @@
 <% provide(:title, @user.name) %>
 <% provide(:class_text, 'apply_attendance') %>
-<% provide(:button_text, '申請') %>
+<% provide(:button_text, '　　申請　　') %>
 <div>
   <table class="table table-bordered table-condensed user-table">
     <tr>
@@ -112,10 +112,11 @@
     
     <tfoot>
       <tr>
-        <td colspan="4">累計日数</td>
-        <td colspan="4">総合勤務時間</td>
-        <td colspan="4">累計在社時間</td>
-        <td colspan="4" rowspan="3"> <!-- 勤怠申請フォーム -->
+        <td colspan="12" rowspan="3"></td>
+        <td>累計日数</td>
+        <td>総合勤務時間</td>
+        <td>累計在社時間</td>
+        <td rowspan="3"> <!-- 勤怠申請フォーム -->
           <%= form_with(model: @user, url: apply_one_month_user_attendance_path(@user, @applying, date: @first_day), local: true, method: :patch) do |f| %>
             <div class="apply-form">
               <% if @applying.attendance_approved.nil? %>
@@ -139,9 +140,9 @@
       </tr>
       
       <tr>
-        <td colspan="4"><%= @attendances.count %></td>
-        <td colspan="4"><%= format_basic_info(@user.work_time).to_f * @worked_sum %></td> <!-- to_fは文字列を浮動小数点数に変換 -->
-        <td colspan="4"><%= format("%.2f", @total_working_times.to_f) %></td>
+        <td rowspan="3"><%= @attendances.count %></td>
+        <td rowspan="3"><%= format_basic_info(@user.work_time).to_f * @worked_sum %></td> <!-- to_fは文字列を浮動小数点数に変換 -->
+        <td rowspan="3"><%= format("%.2f", @total_working_times.to_f) %></td>
       </tr>
     </tfoot>
   </table>

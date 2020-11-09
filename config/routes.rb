@@ -23,7 +23,9 @@ Rails.application.routes.draw do
         get 'overtime_apply'
         patch 'update_overtime_apply'
         patch 'apply_one_month'
+        get 'get_commuting_list'
       end
     end
+    collection {post :import}
   end
 end

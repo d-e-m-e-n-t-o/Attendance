@@ -41,10 +41,10 @@ ActiveRecord::Schema.define(version: 20201103104750) do
     t.boolean "admin", default: false
     t.boolean "superior", default: false
     t.string "affiliation"
-    t.datetime "basic_time", default: "2020-11-02 23:00:00"
-    t.datetime "work_time", default: "2020-11-02 22:30:00"
-    t.datetime "designated_work_start_time", default: "2020-11-03 00:00:00"
-    t.datetime "designated_work_end_time", default: "2020-11-03 09:00:00"
+    t.datetime "basic_time", default: "2020-11-07 23:00:00"
+    t.datetime "work_time", default: "2020-11-07 22:30:00"
+    t.datetime "designated_work_start_time", default: "2020-11-08 00:00:00"
+    t.datetime "designated_work_end_time", default: "2020-11-08 09:00:00"
     t.string "employee_number"
     t.string "uid"
     t.index ["email"], name: "index_users_on_email", unique: true

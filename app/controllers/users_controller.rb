@@ -62,6 +62,11 @@ class UsersController < ApplicationController
     redirect_to users_url
   end
   
+  def import
+    User.import(params[:file].path)
+    redirect_to users_url
+  end
+  
   private
   
     def user_params

@@ -45,4 +45,32 @@ class User < ApplicationRecord
   def forget
     update_attribute(:remember_digest, nil)
   end
+  
+  #importメソッド
+  def self.import(file)
+    detection = CharlockHolmes::EncodingDetector.detect(File.read(file)) # 補足は下記を確認
+    encoding = detection[:encoding] == 'Shift_JIS' ? 'CP932' : detection[:encoding] # 補足は下記を確認
+    CSV.foreach(file, encoding: "#{encoding}:UTF-8", headers: true) do |row|
+      puts row.inspect.to_yaml # ターミナルに中身をyaml形式で出力
+      user = find_by(email: row[:email]) || new # emailが見つかれば、レコードを呼び出し、見つかれなければ、新しく作成
+      user.attributes = row.to_hash.slice(*updatable_attributes) # CSVからデータを取得しセット
+      user.save
+    end
+  end
+
+   # 更新を許可するカラムを定義
+   def self.updatable_attributes
+     ["name", "email", "affiliation", "employee_number", "uid", "basic_time",
+     "designated_work_start_time", "designated_work_end_time", "superior", "admin", "password"]
+   end
 end
+
+# detection = CharlockHolmes::EncodingDetector.detect(File.read(path)) について
+  # ファイルをすべて読み込んでエンコードを推測（あくまで推測）
+  # => {:type=>:text, :encoding=>"Shift_JIS", :ruby_encoding=>"Shift_JIS", :confidence=>100, :language=>"ja"}
+  
+# encoding = detection[:encoding] == 'Shift_JIS' ? 'CP932' : detection[:encoding] について
+  # CharlockHolmes::EncodingDetectorのディテクション結果は、Shift JISの拡張文字コードであるCP932を含む場合にも、
+  # Shift_JISと見なされてしまう為、CP932を優先して利用する。
+  # Shift JISを指定すれば、CSV.foreach()で変換エラーが出る原因となる。
+  # アップサイドは拡張文字コードを変換できることで、ダウンサイドは7種類の記号文字の見た目が完全に一致しないこと。

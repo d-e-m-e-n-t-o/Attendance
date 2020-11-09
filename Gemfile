@@ -17,6 +17,8 @@ gem 'jbuilder',     '~> 2.5'
 gem 'rounding'
 gem 'pry-rails'
 gem 'pry-doc'
+gem 'roo'
+gem 'charlock_holmes', '>= 0.7.6'
 
 group :development, :test do
   gem 'sqlite3', '1.3.13'
