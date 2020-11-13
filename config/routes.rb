@@ -17,15 +17,21 @@ Rails.application.routes.draw do
       patch 'update_basic_info'
       get 'attendances/edit_one_month'
       patch 'attendances/update_one_month'
+      get 'get_commuting_list'
     end
     resources :attendances, only: :update do
       member do
         get 'overtime_apply'
         patch 'update_overtime_apply'
         patch 'apply_one_month'
-        get 'get_commuting_list'
       end
     end
     collection {post :import}
+  end
+  
+  resources :bases do
+    member do
+      patch 'update_type'
+    end
   end
 end

@@ -1,0 +1,42 @@
+<% provide(:class_text, 'base-edit') %>
+<% provide(:button_text, '変更を送信する') %>
+
+<div class="modal-dialog modal-lg modal-dialog-center">
+  <div class="modal-content">
+    <div class="modal-header">
+      <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+      <h1 class="modal-title">【拠点情報修正】</h1>
+    </div>
+    <div class="modal-body">
+      <div class="row">
+        <div class="col-md-10 col-md-offset-1">
+          <%= form_with(model: @base, url: basis_path(@base), local: true, method: :patch) do |f| %>
+            <table class="table table-bordered table-condensed table-hover" id="table-attendances">
+              <thead>
+                <tr>
+                  <th>拠点番号</th>
+                  <th>拠点名</th>
+                  <th>拠点種類</th>
+                </tr>
+              </thead>
+          
+              <tbody>
+                  <td><%= @base.id %></td>
+                  <td><%= f.text_field :name, class: "form-control" %></td>
+                  <td><%= f.select(:type, [["出勤", "出勤"], ["退勤", "退勤"]], {include_blank: "選択して下さい"}, class: 'form-control') %></td>
+              </tbody>
+            </table>
+            <div class="center fixed-bottom">
+              <%= f.submit yield(:button_text), class: "btn btn-primary btn-#{yield(:class_text)}" %>
+              <button type="button" class="btn btn-default btn-<%= yield(:class_text) %>" data-dismiss="modal">
+                キャンセル
+              </button>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

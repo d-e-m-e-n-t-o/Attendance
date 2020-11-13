@@ -3,6 +3,7 @@ ja:
     models:
       user: ユーザー
       attendance: 勤怠
+      base: 拠点
     attributes:
         user:
           id: ID
@@ -29,3 +30,6 @@ ja:
           check_overtime_apply: 翌日
           note: 備考
           user: ユーザーID
+        base:
+          name: 拠点名
+          type: 拠点種類

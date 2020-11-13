@@ -1,0 +1,15 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  month_first_day: 2020-11-13
+  month_request_superior: 1
+  month_request_status: MyString
+  month_check_confirm: false
+  user: one
+
+two:
+  month_first_day: 2020-11-13
+  month_request_superior: 1
+  month_request_status: MyString
+  month_check_confirm: false
+  user: two

@@ -67,6 +67,14 @@ class UsersController < ApplicationController
     redirect_to users_url
   end
   
+  def get_commuting_list
+    @user_ids = Attendance.where(worked_on: Date.today).where.not(started_at: nil).where(finished_at: nil).pluck(:user_id)
+    @users = User.where(id: @user_ids)
+    if @users.blank?
+      flash.now[:danger] = "現在出勤中の社員はおりません。"
+    end
+  end
+  
   private
   
     def user_params
@@ -74,7 +82,8 @@ class UsersController < ApplicationController
     end
     
     def basic_info_params
-      params.require(:user).permit(:affiliation, :basic_time, :work_time)
+      params.require(:user).permit(:name, :email, :affiliation, :employee_number, :uid, :password,
+      :basic_time, :designated_work_start_time, :designated_work_end_time)
     end
 end
 

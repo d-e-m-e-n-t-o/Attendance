@@ -10,8 +10,13 @@
 
 /* Attendance_information_page_button */
 .btn-users-show {
-  margin-top: -10px;
+  margin-top: 10px;
   margin-bottom: 10px;
+}
+
+.various-notices {
+  margin-top: 5px;
+  margin-bottom: 5px;
 }
 
 /* User_attendance_information_table */
@@ -32,14 +37,6 @@
 }
 
 .btn-signup {
-  margin-top: 10px;
-}
-
-.label-user--edit {
-  margin-top: 5px;
-}
-
-.btn-user--edit {
   margin-top: 10px;
 }
 
@@ -88,6 +85,16 @@
   margin-bottom: 10px;
 }
 
+
+.label-basic-info {
+  margin-top: 5px;
+}
+
+.btn-basic-info {
+  margin-top: 8px;
+  width: 100%;
+}
+
 /*削除ボタン横の縦線(擬似要素)
 .user-dlt-btn:before {
   content: '';
@@ -104,11 +111,3 @@
 }*/
 
 /* modal_window_Basic_information_editing */
-.label-basic-info {
-  margin-top: 5px;
-}
-
-.btn-basic-info {
-  margin: 15px 0;
-  width: 30%;
-}

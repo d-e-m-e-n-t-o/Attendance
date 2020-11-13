@@ -13,6 +13,7 @@ User.create!(name: "上長A",
              password: "password",
              password_confirmation: "password",
              employee_number: "1",
+             uid: SecureRandom.urlsafe_base64,
              superior: true)
              
 User.create!(name: "上長B",
@@ -20,6 +21,7 @@ User.create!(name: "上長B",
              password: "password",
              password_confirmation: "password",
              employee_number: "2",
+             uid: SecureRandom.urlsafe_base64,
              superior: true)
              
 User.create!(name: "上長C",
@@ -27,6 +29,7 @@ User.create!(name: "上長C",
              password: "password",
              password_confirmation: "password",
              employee_number: "3",
+             uid: SecureRandom.urlsafe_base64,
              superior: true)
              
 User.create!(name: "管理者A",
@@ -34,12 +37,14 @@ User.create!(name: "管理者A",
              password: "password",
              password_confirmation: "password",
              employee_number: "4",
+             uid: SecureRandom.urlsafe_base64,
              admin: true)
 
 User.create!(name: "管理者B",
              email: "sample-4@email.com",
              password: "password",
              password_confirmation: "password",
+             uid: SecureRandom.urlsafe_base64,
              admin: true)
              
 User.create!(name: "管理者C",
@@ -47,17 +52,26 @@ User.create!(name: "管理者C",
              password: "password",
              password_confirmation: "password",
              employee_number: "5",
+             uid: SecureRandom.urlsafe_base64,
              admin: true)
 
 
-60.times do |n|
+20.times do |n|
   name  = Faker::Name.name
   email = "sample#{n+1}@email.com"
   password = "password"
   employee_number = "#{n+1}"
+  uid = SecureRandom.urlsafe_base64
   User.create!(name: name,
                email: email,
                employee_number: employee_number,
+               uid: uid,
                password: password,
                password_confirmation: password)
+end
+               
+
+3.times do |n|
+  name = "拠点#{n+1}"
+  Base.create!(name: name)
 end

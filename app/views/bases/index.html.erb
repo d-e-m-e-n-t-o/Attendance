@@ -1,0 +1,52 @@
+<% provide(:title, 'All bases') %>
+<% provide(:button_text, '更新') %>
+<% provide(:class_text, 'basic-info') %>
+
+  <h1>拠点一覧</h1>
+
+<div class="container">
+  <div class="row">
+    <table class="table table-condensed table-hover" id="table-attendances">
+      <thead>
+        <tr>
+          <th></th>
+          <th></th>
+          <th>拠点番号</th>
+          <th>拠点名</th>
+          <th>拠点種類</th>
+          <th>拠点種類変更</th>
+        </tr>
+      </thead>
+      
+      <tbody>
+        <% @bases.each do |base| %>
+          <tr>
+            <td><%= link_to "拠点情報修正", edit_basis_path(base), remote: true, class: "btn btn-primary" %></td>
+            <td>
+              <%= link_to "削除", base, method: :delete, data: { confirm: "#{base.name}を削除してよろしいですか？" }, class: "btn btn-primary user-dlt-btn" %>
+            </td>
+            <td><%= base.id %></td>
+            <td><%= base.name %></td>
+            <td><%= base.type %></td>
+            <td>
+              <% if base.type.blank? || base.type == "退勤" %> 
+                <% base_btn_text = base_state(base) %>
+                <%= link_to "#{base_btn_text}登録", update_type_basis_path(base), method: :patch, class: "btn btn-primary btn-attendance" %>
+              <% elsif base.type == "出勤" %>
+                <% base_btn_text = base_state(base) %>
+                <%= link_to "#{base_btn_text}登録", update_type_basis_path(base), method: :patch, class: "btn btn-primary btn-attendance" %>
+              <% end %>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+    
+    <div class="col-md-12 bg-abb-base-button">
+      <%= link_to "拠点情報追加", new_basis_path, class: "btn btn-primary" %>
+    </div>
+  </div>
+</div>
+
+<!--拠点情報修正モーダルウインドウ表示-->
+<div id="edit" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true"></div>

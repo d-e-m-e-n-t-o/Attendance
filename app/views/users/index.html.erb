@@ -1,4 +1,6 @@
 <% provide(:title, 'All Users') %>
+<% provide(:button_text, '更新') %>
+<% provide(:class_text, 'basic-info') %>
 
 <% if params[:search].present? %>
   <h1>検索結果</h1>
@@ -45,19 +47,20 @@
             <% if current_user.admin? && !current_user?(user) %>
               <div class="col-md-11 col-md-offset-1">
                 <a style="color: black;">|<a>
-                <%= link_to "削除", user, method: :delete,data: { confirm: "削除してよろしいですか？" }, class: "btn btn-primary user-dlt-btn" %>
+                <%= link_to "削除", user, method: :delete,data: { confirm: "#{user.name}を削除してよろしいですか？" }, class: "btn btn-primary user-dlt-btn" %>
               </div>
             <% end %>
             
             <div class="col-md-12 bg-edit-button">
-              <%= link_to "編集", edit_basic_info_user_path(user), remote: true, class: "btn btn-primary btn-lg user-edit-btn" %>
+              <button type="button" class="btn btn-primary" data-toggle="collapse" data-target="#<%= "#{user.id}" %>">編集</button>
+                <div id="<%= "#{user.id}" %>" class="collapse">
+                  <% @user = user %>
+                  <%= render 'edit_basic_info' %>
+                </div>
             </div>
           <% end %>
         </tbody>
       </table>
-     <div class="col-md-11 col-md-offset-1"><%= will_paginate %></div>
+    <div class="col-md-11 col-md-offset-1"><%= will_paginate %></div>
   </div>
 </div>
-
-<!--モーダルウインドウ表示-->
-<div id="edit-basic-info" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true"></div>

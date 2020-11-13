@@ -76,12 +76,7 @@ class AttendancesController < ApplicationController
     end
       redirect_to user_url(@user, date: @first_day)
   end
-  
-  def get_commuting_list
-    @attendances = Attendance.where(started_at: present).where.not(finished_at: present)
-    @users = User.wher(id:[:user_id])
-  end
-  
+
   private
    
     def attendances_params

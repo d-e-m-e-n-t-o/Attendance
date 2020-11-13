@@ -1,7 +1,7 @@
 <% provide(:title, "commuting_list") %>
   <div>
     <h1>出勤中社員一覧</h1>
-    <table class="table table-bordered table-condensed table-hover" id="table-attendances">
+    <table class="table table-condensed table-striped table-hover" id="table-attendances">
       <thead>
         <tr>
           <th>社員番号</th>
@@ -12,7 +12,8 @@
         <% @users.each do |user| %>
           <tr>
             <td><%= user.employee_number %></td>
-            <td><%= user.name %></tr>
+            <td><%= user.name %></td>
+          </tr>
         <% end %>
       </tbody>
     </table>
