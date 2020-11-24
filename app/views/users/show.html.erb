@@ -1,5 +1,5 @@
 <% provide(:title, @user.name) %>
-<% provide(:class_text, 'apply_attendance') %>
+<% provide(:class_text, 'apply-attendance') %>
 <% provide(:button_text, '申請') %>
 <div class="container">
   <div class="row">
@@ -29,9 +29,18 @@
   </div>
 </div>
 
-<div class="various-notices"><%= link_to "【所属長承認申請のお知らせ】", "#", style: "color: black;" %></div>
-<div class="various-notices"><%= link_to "【勤怠変更申請のお知らせ】", "#", style: "color: black;" %></div>
-<div class="various-notices"><%= link_to "【残業申請のお知らせ】", "#", style: "color: black;" %></div>
+<% if @user.superior == true %>
+  <div class="various-notices">
+    <%= link_to "【所属長承認申請のお知らせ】", edit_user_monthapply_path(@user, @applying_month, date: @first_day), remote: true,
+    class: "#{@applying_month_count == 0 ? "link-not-applying" : "link-applying"}" %>
+    <% if @applying_month_count !=0 %>
+      <a class="Information-display"><%= "申請中の勤怠が#{@applying_month_count}件あります。" %></a>
+    <% end %>
+  </div>
+    
+  <div class="various-notices"><%= link_to "【勤怠変更申請のお知らせ】", "#", style: "color: black;" %></div>
+  <div class="various-notices"><%= link_to "【残業申請のお知らせ】", "#", style: "color: black;" %></div>
+<% end %>
 
 <div class="btn-users-show">
   <%= link_to "勤怠を編集", attendances_edit_one_month_user_path(date: @first_day), class: "btn btn-primary" %> <!--has_keyをdateで@first_dayを指定。controllerではparams[:date]、で受け取り可。-->
@@ -124,18 +133,25 @@
           <td>総合勤務時間</td>
           <td>累計在社時間</td>
           <td rowspan="3"> <!-- 勤怠申請フォーム -->
-            <%= form_with(model: @user, url: apply_one_month_user_attendance_path(@user, @applying, date: @first_day), local: true, method: :patch) do |f| %>
-              <% if @applying.attendance_approved.nil? %>
+            <%= form_with(model: @user, url: user_monthapply_path(@user, @applying_month, date: @first_day), local: true, method: :patch) do |f| %>
+              <% if @applying_month.month_request_status == "なし" %>
                 <label class="approval-label">所属長承認　未</label>
-              <% else %>
-                <label class="approval-label"><%= "#{@applying.attendance_approved}から承認済み" %></label>
+              <% elsif @applying_month.month_request_status == "申請中" %>
+                <label class="approval-label"><%= "#{@applying_superior.name}に申請中です。" %></label>
+              <% elsif @applying_month.month_request_status == "否認" %>
+                <label class="approval-label"><%= "#{@applying_superior.name}に否認されました。" %></label>
+              <% elsif @applying_month.month_request_status == "承認" %>
+                <label class="approval-label"><%= "#{@applying_superior.name}から承認されました。" %></label>
               <% end %>
               
               <div class="center">
                 <div class= "col-md-12">
                   <div class="apply-form">
-                    <%= f.fields_for :attendance, @attendance do |attendance|%>
-                      <%= attendance.collection_select(:month_request_status, @superiors, :name, :name, {prompt: "選択してください"}, class: 'form-control') %>
+                    <%= f.fields_for :monthapplies, @applying_month do |apply_month|%>
+                      <%= apply_month.hidden_field :month_first_day, :value => @first_day %>
+                      <%= apply_month.hidden_field :month_request_status, :value => "申請中" %>
+                      <%= apply_month.hidden_field :month_check_confirm, :value => 0 %>
+                      <%= apply_month.collection_select(:month_request_superior, @superiors, :id, :name, {include_blank: "選択して下さい", selected: "選択して下さい"}, {class: 'form-control'}) %>
                     <% end %>
                   </div>
                 </div>
@@ -147,6 +163,13 @@
                 </div>
               </div>
             <% end %>
+            <div class="center">
+              <div class= "col-md-12">
+                <% if @applying_month.month_request_status == "申請中" %>
+                  <%= link_to "申請取消", user_monthapply_path(@user, @applying_month, date: @first_day), method: :delete, data: { confirm: "#{ @applying_month.month_first_day.month}月分の申請を取り消してよろしいですか？" }, class: "btn btn-primary btn-#{yield(:class_text)} col-md-12" %>
+                <% end %>
+              </div>
+            </div>
           </td>
         </tr>
         
@@ -160,5 +183,7 @@
   </div>
 </div>
 
-<!--残業申請モーダルウインドウ表示-->
+<!-- 残業申請モーダルウインドウ表示 -->
 <div id="overtime_apply" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true"></div>
+<!-- 勤怠承認モーダル表示(一ヶ月分) -->
+<div id="edit" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true"></div>

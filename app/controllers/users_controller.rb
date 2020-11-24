@@ -1,5 +1,5 @@
 class UsersController < ApplicationController
-  before_action :set_user, only: [:show, :edit, :update, :destroy, :edit_basic_info, :update_basic_info, :update_overtime_application]
+  before_action :set_user_id, only: [:show, :edit, :update, :destroy, :edit_basic_info, :update_basic_info, :update_overtime_application]
   before_action :logged_in_user, only: [:show, :edit, :update, :index, :destroy, :edit_basic_info, :update_basic_info]
   before_action :correct_user, only: [:edit, :update]
   before_action :admin_user, only: [:destroy, :edit_basic_info, :update_basic_info]
@@ -11,8 +11,15 @@ class UsersController < ApplicationController
   
   def show
     @worked_sum = @attendances.where.not(started_at: nil).count
+    unless Monthapply.exists?(month_first_day: @first_day, user_id: @user.id)
+      @user.monthapplies.build(month_first_day: @first_day).save
+    end
     @superiors = User.where(superior: true).where.not(id: @user.id)
-    @applying = Attendance.find_by(worked_on: @first_day)
+    @applying_month = Monthapply.find_by(user_id: @user.id, month_first_day: @first_day)
+    unless @applying_month.month_request_status == "なし"
+      @applying_superior = User.find_by(id: @applying_month.month_request_superior)
+    end
+    @applying_month_count = Monthapply.where(month_request_superior: @user.id, month_request_status: "申請中").count
   end
   
   def create
@@ -68,7 +75,7 @@ class UsersController < ApplicationController
   end
   
   def get_commuting_list
-    @user_ids = Attendance.where(worked_on: Date.today).where.not(started_at: nil).where(finished_at: nil).pluck(:user_id)
+    @user_ids = Attendance.where.not(started_at: nil).where(finished_at: nil).pluck(:user_id)
     @users = User.where(id: @user_ids)
     if @users.blank?
       flash.now[:danger] = "現在出勤中の社員はおりません。"

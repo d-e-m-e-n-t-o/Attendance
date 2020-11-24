@@ -1,5 +1,8 @@
 class Base < ApplicationRecord
   self.inheritance_column = :_type_disabled # 補足は下記を確認
+  
+  validates :number, presence: true, uniqueness: true
+  validates :name, presence: true, uniqueness: true
 end
 
 # self.inheritance_column = :_type_disabled について

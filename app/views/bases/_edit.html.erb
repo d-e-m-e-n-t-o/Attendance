@@ -23,7 +23,7 @@
               </thead>
           
               <tbody>
-                  <td><%= @base.id %></td>
+                  <td><%= f.number_field :number, class: "form-control" %></td>
                   <td><%= f.text_field :name, class: "form-control" %></td>
                   <td><%= f.select(:type, [["出勤", "出勤"], ["退勤", "退勤"]], {include_blank: "選択して下さい"}, class: 'form-control') %></td>
               </tbody>

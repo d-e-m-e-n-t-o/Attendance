@@ -4,7 +4,7 @@ class BasesController < ApplicationController
   before_action :admin_user, only: [:index, :new, :create, :destroy]
   
   def index
-    @bases = Base.all
+    @bases = Base.all.order(:number)
   end
   
   def new
@@ -13,14 +13,18 @@ class BasesController < ApplicationController
   
   def create
     @base = Base.new(base_params)
-    if @base.save
-      flash[:success] = '拠点作成に成功しました。'
-      redirect_to bases_path
-    else
-      flash.now[:danger] = "拠点作成に失敗しました。"
-      render :new
-    end
+      if Base.exists?(number: @base[:number])
+        flash[:danger] = "拠点番号#{@base.number}は既に存在しています。"
+      elsif Base.exists?(name: @base[:name])
+        flash[:danger] = "拠点名#{@base.name}は既に存在しています。"
+      end
+        @base.save!
+        flash[:success] = '拠点作成に成功しました。'
+        redirect_to bases_path
+  rescue ActiveRecord::RecordInvalid
+    redirect_to bases_path
   end
+      
   
   def destroy
     @base.destroy
@@ -49,18 +53,18 @@ class BasesController < ApplicationController
   end
   
   def update
-    if @base.update_attributes(base_params)
-      flash[:success] = "#{@base.name}の情報を修正しました。"
-    else
-      flash[:danger] = "#{@base.name}の情報修正に失敗しました。"
-    end
-      redirect_to bases_path
+    @base.update_attributes!(base_params)
+    flash[:success] = "#{@base.name}の情報を修正しました。"
+    redirect_to bases_path
+  rescue ActiveRecord::RecordInvalid
+    flash[:danger] = "修正される項目のデータが既に存在しています。"
+    redirect_to bases_path
   end
   
   private
   
     def base_params
-      params.require(:base).permit(:name, :type)
+      params.require(:base).permit(:number, :name, :type)
     end
   
   # ↓ before_action_filter ↓

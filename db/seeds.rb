@@ -72,6 +72,8 @@ end
                
 
 3.times do |n|
+  number = n+1
   name = "拠点#{n+1}"
-  Base.create!(name: name)
+  Base.create!(number: number,
+               name: name)
 end

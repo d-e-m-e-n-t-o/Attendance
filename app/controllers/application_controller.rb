@@ -21,11 +21,11 @@ class ApplicationController < ActionController::Base
   end
   
     # ↓ before_action_filter ↓
-    def set_user
+    def set_user_id
       @user = User.find(params[:id])
     end
     
-    def set_user_attendance
+    def set_user_user_id
       @user = User.find(params[:user_id])
     end
     

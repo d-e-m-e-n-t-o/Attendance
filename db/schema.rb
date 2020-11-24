@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20201111061620) do
+ActiveRecord::Schema.define(version: 20201113135011) do
 
   create_table "attendances", force: :cascade do |t|
     t.date "worked_on"
@@ -32,10 +32,22 @@ ActiveRecord::Schema.define(version: 20201111061620) do
   end
 
   create_table "bases", force: :cascade do |t|
+    t.integer "number"
     t.string "name"
     t.string "type"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+  end
+
+  create_table "monthapplies", force: :cascade do |t|
+    t.date "month_first_day"
+    t.integer "month_request_superior"
+    t.string "month_request_status", default: "なし"
+    t.boolean "month_check_confirm"
+    t.integer "user_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["user_id"], name: "index_monthapplies_on_user_id"
   end
 
   create_table "users", force: :cascade do |t|
@@ -48,10 +60,10 @@ ActiveRecord::Schema.define(version: 20201111061620) do
     t.boolean "admin", default: false
     t.boolean "superior", default: false
     t.string "affiliation"
-    t.datetime "basic_time", default: "2020-11-11 23:00:00"
-    t.datetime "work_time", default: "2020-11-11 22:30:00"
-    t.datetime "designated_work_start_time", default: "2020-11-12 00:00:00"
-    t.datetime "designated_work_end_time", default: "2020-11-12 09:00:00"
+    t.datetime "basic_time", default: "2020-11-20 23:00:00"
+    t.datetime "work_time", default: "2020-11-20 22:30:00"
+    t.datetime "designated_work_start_time", default: "2020-11-21 00:00:00"
+    t.datetime "designated_work_end_time", default: "2020-11-21 09:00:00"
     t.string "employee_number"
     t.string "uid"
     t.index ["email"], name: "index_users_on_email", unique: true

@@ -1,6 +1,6 @@
 class AttendancesController < ApplicationController
-  before_action :set_user, only: [:edit_one_month, :update_one_month]
-  before_action :set_user_attendance, only: [:update, :overtime_apply, :update_overtime_apply, :apply_one_month]
+  before_action :set_user_id, only: [:edit_one_month, :update_one_month]
+  before_action :set_user_user_id, only: [:update, :overtime_apply, :update_overtime_apply, :apply_one_month]
   before_action :set_attendance, only: [:update, :overtime_apply, :update_overtime_apply]
   before_action :logged_in_user, only: [:update, :edit_one_month]
   before_action :set_one_month, only: [:edit_one_month, :apply_one_month]
@@ -85,9 +85,5 @@ class AttendancesController < ApplicationController
     
     def overtime_params
       params.require(:user).permit(attendances: [:scheduled_end_time, :check_overtime_apply, :business_content, :directions])[:attendances]
-    end
-    
-    def apply_params
-      params.require(:user).permit(attendance:[:month_request_status])[:attendance]
     end
 end

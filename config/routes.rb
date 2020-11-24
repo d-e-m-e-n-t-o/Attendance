@@ -18,13 +18,15 @@ Rails.application.routes.draw do
       get 'attendances/edit_one_month'
       patch 'attendances/update_one_month'
       get 'get_commuting_list'
+      patch 'monthapplies/applying_update'
     end
     resources :attendances, only: :update do
       member do
         get 'overtime_apply'
         patch 'update_overtime_apply'
-        patch 'apply_one_month'
       end
+    end
+    resources :monthapplies do
     end
     collection {post :import}
   end
@@ -34,4 +36,5 @@ Rails.application.routes.draw do
       patch 'update_type'
     end
   end
+  
 end

@@ -127,10 +127,32 @@ p {
 /* pplication-form */
 .apply-form {
   margin-top: 5px;
-  margin-bottom: 10px;
+  margin-bottom: 5px;
 }
 
 .approval-label {
   margin-top: 5px;
   margin-bottom: -5px;
+}
+
+.btn-apply-attendance {
+  margin-top: 5px;
+  margin-bottom: 5px;
+}
+
+/*applying_link*/
+
+.link-not-applying {
+color : black;
+pointer-events: none;
+}
+
+.link-applying {
+  color : red;
+}
+
+.Information-display {
+  border: 3px solid red;
+  color : red;
+  pointer-events: none;
 }

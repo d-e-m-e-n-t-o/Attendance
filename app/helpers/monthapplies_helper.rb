@@ -1,0 +1,2 @@
+module MonthappliesHelper
+end

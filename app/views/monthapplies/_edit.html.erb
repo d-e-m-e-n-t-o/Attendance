@@ -1,0 +1,52 @@
+<% provide(:class_text, 'applying-month-edit') %>
+<% provide(:button_text, '変更を送信する') %>
+
+<%= form_with(model: @user, url: monthapplies_applying_update_user_path(@user, date: @first_day), local: true, method: :patch) do |f| %>
+  <div class="modal-dialog modal-lg modal-dialog-center">
+    <div class="modal-content">
+      <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+        <span class="monthapplies-index-close", aria-hidden="true">&times;</span>
+      </button>
+      <% @month_applying.each do |id, items| %>
+      <% user = User.find(id) %>
+        <div class="modal-header">
+          <h1 class="modal-title"><%="【#{user.name}からの１ヶ月分勤怠申請】" %></h1>
+        </div>
+        
+        <div class="modal-body">
+          <div class="row">
+            <div class="col-md-10 col-md-offset-1">
+              <table class="table table-bordered table-condensed table-hover" id="table-attendances">
+                <thead>
+                  <tr>
+                    <th>月</th>
+                    <th>指示者確認㊞</th>
+                    <th>変更</th>
+                    <th>勤怠を確認する</th>
+                  </tr>
+                </thead>
+              
+                <% items.each do |item| %>
+                  <tbody>
+                    <tr>
+                      <%= f.fields_for "applying_update_months[]", item do |applying_update_months|%>
+                        <%= render 'shared/error_messages', object: @user %>
+                        <td><%= "#{item.month_first_day.month}月" %></td>
+                        <td><%= applying_update_months.select(:month_request_status, [["なし", "なし"], ["承認", "承認"], ["否認", "否認"]], {include_blank: "選択して下さい"}, class: 'form-control') %></td>
+                        <td><%= applying_update_months.check_box :month_check_confirm, id: "remember-me" %></td>
+                        <td><%= link_to "確認", user_monthapply_path(user, item, date: item.month_first_day), method: :get, class: "btn btn-primary btn-attendance" %></td>
+                      <% end %>
+                    </tr>
+                  </tbody>
+                <% end %>
+              </table>
+            </div>
+          </div>
+        </div>
+      <% end %>
+      <div class="center monthapplies-index-btn">
+        <%= f.submit yield(:button_text), class: "btn btn-primary btn-#{yield(:class_text)}" %>
+      </div>
+    </div>
+  </div>
+<% end %>
