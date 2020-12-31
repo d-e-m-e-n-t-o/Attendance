@@ -22,7 +22,7 @@
                     <th>月</th>
                     <th>指示者確認㊞</th>
                     <th>変更</th>
-                    <th>勤怠を確認する</th>
+                    <th>詳細確認</th>
                   </tr>
                 </thead>
               
@@ -34,7 +34,7 @@
                         <td><%= "#{item.month_first_day.month}月" %></td>
                         <td><%= applying_update_months.select(:month_request_status, [["なし", "なし"], ["承認", "承認"], ["否認", "否認"]], {include_blank: "選択して下さい"}, class: 'form-control') %></td>
                         <td><%= applying_update_months.check_box :month_check_confirm, id: "remember-me" %></td>
-                        <td><%= link_to "確認", user_monthapply_path(user, item, date: item.month_first_day), method: :get, class: "btn btn-primary btn-attendance" %></td>
+                        <td><%= link_to "確認", user_monthapply_path(user, item, date: item.month_first_day, login_user: @user.id), method: :get, class: "btn btn-primary btn-attendance" %></td>
                       <% end %>
                     </tr>
                   </tbody>

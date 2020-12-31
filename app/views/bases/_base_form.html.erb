@@ -1,7 +1,7 @@
 <%= form_with(model: @base, local: true) do |f| %>
 
   <%= f.label :number, class: "label-#{yield(:class_text)}" %>
-  <%= f.number_field :number, class: "form-control" %>
+  <%= f.number_field :number, min: 1, class: "form-control" %>
 
   <%= f.label :name, class: "label-#{yield(:class_text)}" %>
   <%= f.text_field :name, class: "form-control" %>

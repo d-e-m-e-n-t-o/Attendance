@@ -12,7 +12,7 @@
     <div class="modal-body">
       <div class="row">
         <div class="col-md-10 col-md-offset-1">
-          <%= form_with(model: @user, url: update_overtime_apply_user_attendance_path(@user, @attendance), local: true, method: :patch) do |f| %>
+          <%= form_with(model: @user, url: update_over_apply_user_attendance_path(@user, @attendance, date: @first_day), local: true, method: :patch) do |f| %>
             <table class="table table-bordered table-condensed table-hover" id="table-attendances">
               <thead>
                 <tr>
@@ -32,10 +32,12 @@
                   <td class='<%= "wday#{@attendance.worked_on.wday}"%>'>
                     <%= $days_of_the_week[@attendance.worked_on.wday] %>
                   </td>
-                  <td><%= attendance.time_field :scheduled_end_time, class: "form-control" %></td>
-                  <td><%= attendance.check_box :check_overtime_apply, id: "remember-me" %></td>
-                  <td><%= attendance.text_field :business_content, class: "form-control" %></td>
-                  <td><%= attendance.collection_select(:directions, @superiors, :name, :name, prompt: "選択してください", class: 'form-control') %></td>
+                  <td><%= attendance.time_field :over_end_at, class: "form-control" %></td>
+                  <td><%= attendance.check_box :over_next_day, id: "remember-me" %></td>
+                  <td><%= attendance.text_field :over_note, class: "form-control" %></td>
+                  <td><%= attendance.collection_select(:over_request_superior, @superiors, :id, :name, {prompt: "選択してください"}, class: 'form-control') %></td>
+                  <%= attendance.hidden_field :over_request_status, :value => "申請中" %>
+                  <%= attendance.hidden_field :over_check_confirm, :value => "0" %>
                 <% end %>
               </tbody>
             </table>

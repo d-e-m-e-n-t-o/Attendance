@@ -15,18 +15,30 @@ Rails.application.routes.draw do
     member do
       get 'edit_basic_info'
       patch 'update_basic_info'
-      get 'attendances/edit_one_month'
-      patch 'attendances/update_one_month'
+      get 'attendances/edit_days_apply'
+      get 'attendances/edit_days_applying'
+      get 'attendances/attendances_applying_update_index'
+      patch 'attendances/update_edit_days_applying'
+      patch 'attendances/update_edit_days_apply'
+      get 'attendances/over_applying'
+      patch 'attendances/update_over_applying'
       get 'get_commuting_list'
       patch 'monthapplies/applying_update'
+      get 'attendances/approval_log'
     end
-    resources :attendances, only: :update do
+    resources :attendances do
       member do
-        get 'overtime_apply'
-        patch 'update_overtime_apply'
+        get 'over_apply'
+        get 'edit_day_reapply'
+        patch 'update_over_apply'
+        patch 'destroy_edit_days_apply'
+        patch 'destroy_over_apply'
       end
     end
     resources :monthapplies do
+      member do
+        patch 'destroy_month_apply'
+      end
     end
     collection {post :import}
   end

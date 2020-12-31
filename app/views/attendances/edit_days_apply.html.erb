@@ -1,0 +1,85 @@
+<% provide(:title, @user.name) %>
+<%= form_with(model: @user, url: attendances_update_edit_days_apply_user_path(date: @first_day), local: true, method: :patch) do |f| %>
+  <h1>勤怠変更申請画面</h1>
+  <a class = "edit-day-apply-a">承認または否認された日付を再申請する場合、申請状況の再申請ボタンより申請を行ってください。</a>
+  <div class="container">
+    <div class="row">
+      <table class="table table-bordered table-condensed table-hover" id="table-attendances">
+        <thead>
+          <tr>
+            <th>日付</th>
+            <th>曜日</th>
+            <th>出勤時間</th>
+            <th>退勤時間</th>
+            <th>翌日</th>
+            <th>在社時間</th>
+            <th>変更申請理由</th>
+            <th>指示書確認㊞</th>
+            <th>申請状況</th>
+          </tr>
+        </thead>
+        
+        <tbody>
+          <% @attendances.each do |day| %>
+          <% day_applying_superior = User.find_by(id: day.edit_day_request_superior) %>
+            <%= f.fields_for "attendances[]", day do |attendance| %>
+              <tr>
+                <td><%= l(day.worked_on, format: :short) %></td>
+                <td class='<%= "wday#{day.worked_on.wday}"%>'>
+                  <%= $days_of_the_week[day.worked_on.wday] %>
+                </td>
+                <td><%= attendance.time_field :edit_day_started_at, class: "#{day.edit_day_request_status == "申請中" || day.edit_day_request_status == "承認" || day.edit_day_request_status == "否認" ? "day-not-apply-form form-control" : "form-control"}" %></td>
+                <td><%= attendance.time_field :edit_day_finished_at, class: "#{day.edit_day_request_status == "申請中" || day.edit_day_request_status == "承認" || day.edit_day_request_status == "否認" ? "day-not-apply-form form-control" : "form-control"}" %></td>
+                <td>
+                  <% if day.edit_day_request_status == "申請中" || day.edit_day_request_status == "承認" || day.edit_day_request_status == "否認" %>
+                    <%= attendance.check_box :edit_next_day, class: "day-not-apply-form", id: "remember-me" %></td>
+                  <% else %>
+                    <%= attendance.check_box :edit_next_day, id: "remember-me" %></td>
+                  <% end %>
+                <td>
+                  <% if day.edit_day_started_at.present? && day.edit_day_finished_at.present? %>
+                    <%= working_times(day.edit_day_started_at, day.edit_day_finished_at) %>
+                  <% end %>
+                </td>
+                <td><%= attendance.text_field :day_note, class: "#{day.edit_day_request_status == "申請中" || day.edit_day_request_status == "承認" || day.edit_day_request_status == "否認" ? "day-not-apply-form form-control" : "form-control"}" %></td>
+                <td>
+                  <% if day.edit_day_request_status == "申請中" || day.edit_day_request_status == "承認" || day.edit_day_request_status == "否認" %>
+                    <%= attendance.select(:edit_day_request_superior, [["#{day_applying_superior.name}", "#{day_applying_superior.id}"]], {}, {class: 'day-not-apply-form form-control form-control'}) %>
+                  <% else %>
+                    <%= attendance.collection_select(:edit_day_request_superior, @superiors, :id, :name, {include_blank: "選択して下さい", selected: "選択して下さい"}, {class: 'form-control'}) %>
+                  <% end %>
+                </td>
+                <td>
+                  <% if day.edit_day_request_status == "なし" && day.edit_day_check_confirm == true %>
+                    <label class="approval-label"><%= "#{day_applying_superior.name}" + "より申請が取り消されました。" %></label></br>
+                    <%= link_to "再申請", edit_day_reapply_user_attendance_path(@user, day.id, date: @first_day), remote: true, class: "btn btn-primary" %>
+                  <% elsif day.edit_day_request_status == "申請中" %>
+                    <label class="approval-label"><%= "#{day.edit_day_request_status}" %></label></br>
+                    <%= link_to "申請取消", destroy_edit_days_apply_user_attendance_path(@user, day.id, date: @first_day), method: :patch, data: { confirm: "#{l(day.worked_on, format: :short)}の申請を取り消してよろしいですか？" }, class: "btn btn-primary btn-#{yield(:class_text)}" %>
+                  <% elsif day.edit_day_request_status == "承認" || day.edit_day_request_status == "否認" %>
+                    <label class="approval-label"><%= "#{day_applying_superior.name}" + "より申請が" +"#{day.edit_day_request_status}" + "されました。" %></label></br>
+                    <%= link_to "再申請", edit_day_reapply_user_attendance_path(@user, day.id, date: @first_day), remote: true, class: "btn btn-primary" %>
+                  <% else %>
+                    <label class="approval-label">未申請</label>
+                  <% end %>
+                </td>
+              </tr>
+              <% if day.edit_day_request_status == "なし" %>
+                <%= attendance.hidden_field :edit_day_request_status, :value => "申請中" %>
+                <%= attendance.hidden_field :edit_day_check_confirm, :value => "0" if day.edit_day_check_confirm == nil && day.edit_day_check_confirm == false %>
+              <% end %>
+            <% end %>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="center">
+    <%= f.submit "まとめて申請", class: "btn btn-lg btn-primary" %>
+    <%= link_to "キャンセル", user_path(date: @first_day), class: "btn btn-lg btn-default" %>
+  </div>
+<% end %>
+
+<!-- 再申請モーダルウインドウ表示 -->
+<div id="edit_day_reapply" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true"></div>

@@ -9,7 +9,7 @@
 # coding: utf-8
 
 User.create!(name: "上長A",
-             email: "sample@email.com",
+             email: "sample1@email.com",
              password: "password",
              password_confirmation: "password",
              employee_number: "1",
@@ -17,7 +17,7 @@ User.create!(name: "上長A",
              superior: true)
              
 User.create!(name: "上長B",
-             email: "sample-1@email.com",
+             email: "sample-2@email.com",
              password: "password",
              password_confirmation: "password",
              employee_number: "2",
@@ -25,7 +25,7 @@ User.create!(name: "上長B",
              superior: true)
              
 User.create!(name: "上長C",
-             email: "sample-2@email.com",
+             email: "sample-3@email.com",
              password: "password",
              password_confirmation: "password",
              employee_number: "3",
@@ -33,7 +33,7 @@ User.create!(name: "上長C",
              superior: true)
              
 User.create!(name: "管理者A",
-             email: "sample-3@email.com",
+             email: "sample-4@email.com",
              password: "password",
              password_confirmation: "password",
              employee_number: "4",
@@ -41,22 +41,23 @@ User.create!(name: "管理者A",
              admin: true)
 
 User.create!(name: "管理者B",
-             email: "sample-4@email.com",
-             password: "password",
-             password_confirmation: "password",
-             uid: SecureRandom.urlsafe_base64,
-             admin: true)
-             
-User.create!(name: "管理者C",
              email: "sample-5@email.com",
              password: "password",
              password_confirmation: "password",
              employee_number: "5",
              uid: SecureRandom.urlsafe_base64,
              admin: true)
+             
+User.create!(name: "管理者C",
+             email: "sample-6@email.com",
+             password: "password",
+             password_confirmation: "password",
+             employee_number: "6",
+             uid: SecureRandom.urlsafe_base64,
+             admin: true)
 
 
-20.times do |n|
+(6..20).each do |n|
   name  = Faker::Name.name
   email = "sample#{n+1}@email.com"
   password = "password"
@@ -70,7 +71,6 @@ User.create!(name: "管理者C",
                password_confirmation: password)
 end
                
-
 3.times do |n|
   number = n+1
   name = "拠点#{n+1}"

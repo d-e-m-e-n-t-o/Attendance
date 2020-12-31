@@ -6,20 +6,27 @@ class UsersController < ApplicationController
   before_action :set_one_month, only: :show
   
   def new
-    @user = User.new
+    employee_number_temp = "#{User.last[:employee_number].to_i + 1}"
+    uid_temp = SecureRandom.urlsafe_base64
+    while User.exists?(uid: uid_temp) do
+      uid_temp = SecureRandom.urlsafe_base64
+    end
+    @user = User.new(employee_number: employee_number_temp, uid: uid_temp)
   end
   
   def show
-    @worked_sum = @attendances.where.not(started_at: nil).count
-    unless Monthapply.exists?(month_first_day: @first_day, user_id: @user.id)
-      @user.monthapplies.build(month_first_day: @first_day).save
-    end
     @superiors = User.where(superior: true).where.not(id: @user.id)
     @applying_month = Monthapply.find_by(user_id: @user.id, month_first_day: @first_day)
-    unless @applying_month.month_request_status == "なし"
-      @applying_superior = User.find_by(id: @applying_month.month_request_superior)
+    if @applying_month.month_request_status != "なし" || @applying_month.month_check_confirm == true
+      @applying_month_superior = User.find_by(id: @applying_month.month_request_superior)
     end
     @applying_month_count = Monthapply.where(month_request_superior: @user.id, month_request_status: "申請中").count
+    @applying_edit_day_count = Attendance.where(edit_day_request_superior: @user.id, edit_day_request_status: "申請中").count
+    @applying_over_count = Attendance.where(over_request_superior: @user.id, over_request_status: "申請中").count
+    @monthapplies_update_applying = @user.monthapplies.where(month_check_confirm: true)
+    @edit_day_update_applying = @user.attendances.where(edit_day_check_confirm: true)
+    @over_update_applying = @user.attendances.where(over_check_confirm: true)
+    @update_applying_count = @monthapplies_update_applying.count.to_i + @edit_day_update_applying.count.to_i + @over_update_applying.count.to_i
   end
   
   def create
@@ -85,12 +92,11 @@ class UsersController < ApplicationController
   private
   
     def user_params
-      params.require(:user).permit(:name, :email, :affiliation, :password, :password_confirmation)
+      params.require(:user).permit(:name, :email, :affiliation, :employee_number, :uid, :password, :password_confirmation)
     end
     
     def basic_info_params
-      params.require(:user).permit(:name, :email, :affiliation, :employee_number, :uid, :password,
+      params.require(:user).permit(:name, :superior, :admin, :email, :affiliation, :employee_number, :uid, :password,
       :basic_time, :designated_work_start_time, :designated_work_end_time)
     end
 end
-

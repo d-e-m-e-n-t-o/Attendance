@@ -1,6 +1,6 @@
 source 'https://rubygems.org'
 
-gem 'rails',        '~> 5.1.6'
+gem 'rails',        '~> 6.0.0'
 gem 'rails-i18n'
 gem 'bcrypt'
 gem 'faker'
@@ -19,9 +19,10 @@ gem 'pry-rails'
 gem 'pry-doc'
 gem 'roo'
 gem 'charlock_holmes', '>= 0.7.6'
+gem 'tod'
 
 group :development, :test do
-  gem 'sqlite3', '1.3.13'
+  gem 'sqlite3', '~> 1.4'
   gem 'byebug', platforms: [:mri, :mingw, :x64_mingw]
   gem 'awesome_print'
 end

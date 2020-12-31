@@ -1,0 +1,88 @@
+<% provide(:class_text, 'edit-days-applying') %>
+<% provide(:button_text, '変更を送信する') %>
+
+<%= form_with(model: @user, url: attendances_update_edit_days_applying_user_path(@user, date: @first_day), local: true, method: :patch) do |f| %>
+  <div class="modal-dialog modal-lg modal-dialog-center">
+    <div class="modal-content">
+      <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+        <span class="monthapplies-index-close", aria-hidden="true">&times;</span>
+      </button>
+      <% @edit_days_applying.each do |id, items| %>
+      <% user = User.find(id) %>
+        <div class="modal-header">
+          <h1 class="modal-title"><%="【#{user.name}からの勤怠変更申請】" %></h1>
+        </div>
+        
+        <div class="modal-body">
+          <div class="row">
+            <div class="col-md-10 col-md-offset-1">
+              <table class="table table-bordered table-condensed table-hover" id="table-attendances">
+                <thead>
+                  <tr>
+                    <th rowspan="3">日付</th>
+                    <th rowspan="3">曜日</th>
+                    <th colspan="4">変更前</th>
+                    <th colspan="4">変更後</th>
+                    <th rowspan="3">備考</th>
+                    <th rowspan="3">指示者確認㊞</th>
+                    <th rowspan="3">変更</th>
+                    <th rowspan="3">詳細確認</th>
+                  </tr>
+                  
+                  <tr>
+                    <th colspan="2">出社</th>
+                    <th colspan="2">退社</th>
+                    <th colspan="2">出社</th>
+                    <th colspan="2">退社</th>
+                  </tr>
+                  
+                  <tr>
+                    <th>時</th>
+                    <th>分</th>
+                    <th>時</th>
+                    <th>分</th>
+                    <th>時</th>
+                    <th>分</th>
+                    <th>時</th>
+                    <th>分</th>
+                  </tr>
+                </thead>
+              
+                <% items.each do |item| %>
+                  <tbody>
+                    <tr>
+                      <%= f.fields_for "applying_update_edit_days[]", item do |applying_update_edit_days|%>
+                        <%= render 'shared/error_messages', object: @user %>
+                        <td><%= l(item.worked_on, format: :short) %></td>
+                        <td class='<%= "wday#{item.worked_on.wday}"%>'>
+                          <%= $days_of_the_week[item.worked_on.wday] %>
+                        </td>
+                        <td><%= l(item.before_started_at, format: :hour) if item.before_started_at.present? %></td>
+                        <td><%= l(item.before_started_at, format: :min) if item.before_started_at.present? %></td>
+                        <td><%= l(item.before_finished_at, format: :hour) if item.before_finished_at.present? %></td>
+                        <td><%= l(item.before_finished_at, format: :min) if item.before_finished_at.present? %></td>
+                        
+                        <td><%= l(item.edit_day_started_at, format: :hour) if item.edit_day_started_at.present? %></td>
+                        <td><%= l(item.edit_day_started_at, format: :min) if item.edit_day_started_at.present? %></td>
+                        <td><%= l(item.edit_day_finished_at, format: :hour) if item.edit_day_finished_at.present? %></td>
+                        <td><%= l(item.edit_day_finished_at, format: :min) if item.edit_day_finished_at.present? %></td>
+                        
+                        <td><%= item.day_note %></td>
+                        <td><%= applying_update_edit_days.select(:edit_day_request_status, [["なし", "なし"], ["承認", "承認"], ["否認", "否認"]], {include_blank: "選択して下さい"}, class: 'form-control') %></td>
+                        <td><%= applying_update_edit_days.check_box :edit_day_check_confirm, id: "remember-me" %></td>
+                        <td><%= link_to "確認", user_monthapply_path(user, item, date: @first_day, login_user: @user.id), method: :get, class: "btn btn-primary btn-attendance" %></td>
+                      <% end %>
+                    </tr>
+                  </tbody>
+                <% end %>
+              </table>
+            </div>
+          </div>
+        </div>
+      <% end %>
+      <div class="center monthapplies-index-btn">
+        <%= f.submit yield(:button_text), class: "btn btn-primary btn-#{yield(:class_text)}" %>
+      </div>
+    </div>
+  </div>
+<% end %>

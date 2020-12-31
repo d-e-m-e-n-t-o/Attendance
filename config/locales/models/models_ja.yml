@@ -10,8 +10,7 @@ ja:
           name: 名前
           email: メールアドレス
           affiliation: 所属
-          basic_time: 基本時間
-          work_time: 勤務時間
+          basic_time: 基本勤務時間
           admin: 管理者
           superior: 上長
           employee_number: 社員番号
@@ -26,11 +25,16 @@ ja:
           worked_on: 日付
           started_at: 出勤時間
           finished_at: 退勤時間
-          scheduled_end_time: 終了予定時間
-          check_overtime_apply: 翌日
-          note: 備考
+          edit_day_started_at: 出勤時間
+          edit_next_day: 変更欄
+          over_end_at: 終了予定時間
+          over_next_day: 翌日
+          day_note: 備考
           user: ユーザーID
         base:
           number: 拠点番号
           name: 拠点名
           type: 拠点種類
+        monthapply:
+          month_request_status: 指示者確認㊞
+          month_check_confirm: 変更欄

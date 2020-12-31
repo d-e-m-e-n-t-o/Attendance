@@ -8,7 +8,8 @@ class BasesController < ApplicationController
   end
   
   def new
-    @base = Base.new
+    base_number = Base.last[:number] + 1
+    @base = Base.new(number: base_number)
   end
   
   def create

@@ -6,23 +6,35 @@
     <table class="table table-bordered table-condensed user-table">
       <tr>
         <td>
-          <%= link_to "←", user_path(date: @first_day.prev_month), class: "btn btn-primary btn-sm" %>
-          【<%= l(@first_day, format: :middle) %>】時間管理表
-          <%= link_to "→", user_path(date: @first_day.next_month), class: "btn btn-primary btn-sm" %>
+          <div class="user-info-display">
+            <%= link_to "←", user_path(date: @first_day.prev_month), class: "btn btn-primary btn-sm" %>
+            【<%= l(@first_day, format: :middle) %>】勤怠管理表
+            <%= link_to "→", user_path(date: @first_day.next_month), class: "btn btn-primary btn-sm" %>
+          </div>
         </td>
-        <td>指定勤務開始時間<%= format_basic_info(@user.designated_work_start_time) %><br>
-            指定勤務終了時間<%= format_basic_info(@user.designated_work_end_time) %></br>
+        <td>
+          <div>
+            指定勤務開始時間<%= format_basic_info(@user.designated_work_start_time) %></br>
+            指定勤務終了時間<%= format_basic_info(@user.designated_work_end_time) %>
+          <div>
         </td>
-        <td colspan="3">基本時間<%= format_basic_info(@user.basic_time) %></td>
-        <td>月初日：<%= l(@first_day, format: :short) %></td>
+        <td colspan="2">
+          <div class="user-info-basic-time">
+            基本時間<%= format_basic_info(@user.basic_time) %>
+          </div>
+        </td>
+        <td>
+          <div class="user-info-first-day">
+            月初日：<%= l(@first_day, format: :short) %>
+          </div>
+        </td>
       </tr>
     
       <tr>
         <td>所属：<%= @user.affiliation.present? ? @useraffiliationt : "未所属" %></td>
         <td>名前：<%= @user.name %></td>
-        <td>コード</td>
-        <td>?????</td>
-        <td>出勤日数：<%= @worked_sum %>日</td>
+        <td>社員番号: <%= @user.employee_number %></td>
+        <td>カードID：<%= @user.uid %></td>
         <td>月末日：<%= l(@last_day, format: :short) %></td>
       </tr>
     </table>
@@ -31,21 +43,39 @@
 
 <% if @user.superior == true %>
   <div class="various-notices">
+  <div class="various-notice">
     <%= link_to "【所属長承認申請のお知らせ】", edit_user_monthapply_path(@user, @applying_month, date: @first_day), remote: true,
     class: "#{@applying_month_count == 0 ? "link-not-applying" : "link-applying"}" %>
     <% if @applying_month_count !=0 %>
-      <a class="Information-display"><%= "申請中の勤怠が#{@applying_month_count}件あります。" %></a>
+      <a class="information-display"><%= "勤怠申請（一ヶ月）が#{@applying_month_count}件あります。" %></a>
     <% end %>
   </div>
     
-  <div class="various-notices"><%= link_to "【勤怠変更申請のお知らせ】", "#", style: "color: black;" %></div>
-  <div class="various-notices"><%= link_to "【残業申請のお知らせ】", "#", style: "color: black;" %></div>
+  <div class="various-notice">
+    <%= link_to "【勤怠変更申請のお知らせ】", attendances_edit_days_applying_user_path(@user, date: @first_day), remote: true,
+    class: "#{@applying_edit_day_count == 0 ? "link-not-applying" : "link-applying"}" %>
+    <% if @applying_edit_day_count !=0 %>
+      <a class="information-display"><%= "勤怠変更申請（一日）が#{@applying_edit_day_count}件あります。" %></a>
+    <% end %>
+  </div>
+    
+  <div class="various-notice">
+    <%= link_to "【残業申請のお知らせ】", attendances_over_applying_user_path(@user, date: @first_day), remote: true,
+    class: "#{@applying_over_count == 0 ? "link-not-applying" : "link-applying"}" %>
+    <% if @applying_over_count !=0 %>
+      <a class="information-display"><%= "残業申請が#{@applying_over_count}件あります。" %></a>
+    <% end %>
+  </div>
+  </div>
 <% end %>
 
-<div class="btn-users-show">
-  <%= link_to "勤怠を編集", attendances_edit_one_month_user_path(date: @first_day), class: "btn btn-primary" %> <!--has_keyをdateで@first_dayを指定。controllerではparams[:date]、で受け取り可。-->
-  <%= link_to "CSV出力", "#", class: "btn btn-primary" %><br>
-  <%= link_to "勤怠修正ログ (承認済)", "#", class: "btn btn-primary" %></br>
+<div class="attendance-management-btn">
+  <%= link_to "勤怠変更を申請", attendances_edit_days_apply_user_path(date: @first_day), class: "btn btn-primary btn-users-show" %>
+  <%= link_to "CSV出力", user_attendances_path(@user, date: @first_day, format: :csv), class: "btn btn-primary btn-users-show" %>
+  <%= link_to "勤怠修正ログ (承認済)", attendances_approval_log_user_path(@user, date: @first_day), class: "btn btn-primary btn-users-show" %>
+  <% if @update_applying_count !=0 %>
+    <%= link_to "【各種申請中の勤怠に関するお知らせ #{@update_applying_count}件】", attendances_attendances_applying_update_index_user_path(@user, date: @first_day), class: "applying-info" %>
+  <% end %>
 </div>
 
 <div class="container">
@@ -85,8 +115,15 @@
     
       <tbody>
         <% @attendances.each do |day| %>
+        <% day_applying_superior = User.find_by(id: day.edit_day_request_superior) %>
+        <% over_applying_superior = User.find_by(id: day.over_request_superior) %>
           <tr>
-            <td><%= link_to "残業申請", overtime_apply_user_attendance_path(@user, day), remote: true, class: "btn btn-primary" %></td>
+            <td>
+              <% if day.over_request_status == "申請中" %>
+                <%= link_to "申請取消", destroy_over_apply_user_attendance_path(@user, day, date: @first_day), method: :patch, data: { confirm: "#{l(day.worked_on, format: :short)}の申請を取り消してよろしいですか？" }, class: "btn btn-primary btn-#{yield(:class_text)}" %>
+              <% else %>
+                <%= link_to "残業申請", over_apply_user_attendance_path(@user, day), remote: true, class: "btn btn-primary" %></td>
+              <% end %>
             <td><%= l(day.worked_on, format: :short) %></td>
             <td class='<%= "wday#{day.worked_on.wday}"%>'>
               <%= $days_of_the_week[day.worked_on.wday] %>
@@ -106,42 +143,73 @@
               <% end %>
             </td>
             <td>
-              <% if day.started_at.present? && day.finished_at.present? %>
-                <%= str_times = working_times(day.started_at, day.finished_at) %>
-                <% @total_working_times = @total_working_times.to_f + str_times.to_f %>
+              <% if day.started_at.present? && day.finished_at.present?%>
+                <%= spent_time = working_times(day.started_at, day.finished_at) %>
+                <% @total_working_times = @total_working_times.to_f + spent_time.to_f %>
               <% end %>
             </td>
-            <td><%= day.note %></td>
-            <td><%= l(day.scheduled_end_time, format: :hour) if day.scheduled_end_time.present? %></td>
-            <td><%= l(day.scheduled_end_time, format: :min) if day.scheduled_end_time.present? %></td>
+            <td><%= day.day_note %></td>
+            <td><%= l(day.over_end_at, format: :hour) if day.over_end_at.present? %></td>
+            <td><%= l(day.over_end_at, format: :min) if day.over_end_at.present? %></td>
             <td>
-              <% if day.scheduled_end_time.present? &&day.finished_at.present? %>
-              <%= over_time = over_times(day.scheduled_end_time, day.finished_at, day.check_overtime_apply) %>
+              <% if day.over_end_at.present? && %>
+                <%= over_time = over_times(day.id, day.over_end_at, day.finished_at, day.over_next_day) %>
+                <% @total_over_times =  @total_over_times.to_f + over_time.to_f %>
                 <% @total_working_times = @total_working_times.to_f + over_time.to_f %>
               <% end %>
             </td>
-            <td><%= day.business_content %></td>
-            <td><%= day.directions %></td>
+            <td><%= day.over_note if day.over_request_status %></td>
+            <td>
+              <div class="center">
+                <div class= "col-md-12">
+                  <% if day.edit_day_request_status == "申請中" %>
+                    <label class="approval-label"><%= "#{day_applying_superior.name}に勤怠変更を申請中です。" %></label>
+                  <% elsif day.edit_day_request_status == "否認" %>
+                    <label class="approval-label"><%= "#{day_applying_superior.name}から勤怠変更申請を否認されました。" %></label>
+                  <% elsif day.edit_day_request_status == "承認" %>
+                    <label class="approval-label"><%= "#{day_applying_superior.name}から勤怠変更申請を承認されました。" %></label>
+                  <% elsif day.edit_day_request_status == "なし" && day.edit_day_check_confirm == true %>
+                    <label class="approval-label"><%= "#{day_applying_superior.name}から勤怠変更申請を取り消されました。" %></label>
+                  <% end %>
+                </div>
+              </div>
+              <div class="center">
+                <div class= "col-md-12">
+                  <% if day.over_request_status == "申請中" %>
+                    <label class="approval-label"><%= "#{over_applying_superior.name}に残業を申請中です。" %></label>
+                  <% elsif day.over_request_status == "否認" %>
+                    <label class="approval-label"><%= "#{over_applying_superior.name}から残業申請を否認されました。" %></label>
+                  <% elsif day.over_request_status == "承認" %>
+                    <label class="approval-label"><%= "#{over_applying_superior.name}から残業申請を承認されました。" %></label>
+                  <% elsif day.over_request_status == "なし" && day.over_check_confirm == true %>
+                    <label class="approval-label"><%= "#{over_applying_superior.name}から残業申請を取り消されました。" %></label>
+                  <% end %>
+                </div>
+              </div>
+            </td>
           </tr>
         <% end %>
       </tbody>
       
       <tfoot>
         <tr>
-          <td colspan="12" rowspan="3"></td>
-          <td>累計日数</td>
-          <td>総合勤務時間</td>
+          <td colspan="11" rowspan="3"></td>
+          <td>累計勤務日数</td>
           <td>累計在社時間</td>
-          <td rowspan="3"> <!-- 勤怠申請フォーム -->
+          <td>累計残業日数</td>
+          <td>累計残業時間</td>
+          <td rowspan="3"> <!-- 勤怠申請フォーム(一ヶ月) -->
             <%= form_with(model: @user, url: user_monthapply_path(@user, @applying_month, date: @first_day), local: true, method: :patch) do |f| %>
               <% if @applying_month.month_request_status == "なし" %>
-                <label class="approval-label">所属長承認　未</label>
+                <label class="approval-label">所属長申請　未</label>
               <% elsif @applying_month.month_request_status == "申請中" %>
-                <label class="approval-label"><%= "#{@applying_superior.name}に申請中です。" %></label>
+                <label class="approval-label"><%= "#{@applying_month_superior.name}に申請中です。" %></label>
               <% elsif @applying_month.month_request_status == "否認" %>
-                <label class="approval-label"><%= "#{@applying_superior.name}に否認されました。" %></label>
+                <label class="approval-label"><%= "#{@applying_month_superior.name}から否認されました。" %></label>
               <% elsif @applying_month.month_request_status == "承認" %>
-                <label class="approval-label"><%= "#{@applying_superior.name}から承認されました。" %></label>
+                <label class="approval-label"><%= "#{@applying_month_superior.name}から承認されました。" %></label>
+              <% elsif @applying_month.month_request_status == "なし" && @applying_month.month_check_confirm == true %>
+                <label class="approval-label"><%= "#{@applying_month_superior.name}から申請を取り消されました。" %></label>
               <% end %>
               
               <div class="center">
@@ -151,7 +219,9 @@
                       <%= apply_month.hidden_field :month_first_day, :value => @first_day %>
                       <%= apply_month.hidden_field :month_request_status, :value => "申請中" %>
                       <%= apply_month.hidden_field :month_check_confirm, :value => 0 %>
-                      <%= apply_month.collection_select(:month_request_superior, @superiors, :id, :name, {include_blank: "選択して下さい", selected: "選択して下さい"}, {class: 'form-control'}) %>
+                      <% if @applying_month.month_request_status != "申請中" %>
+                        <%= apply_month.collection_select(:month_request_superior, @superiors, :id, :name, {include_blank: "選択して下さい", selected: "選択して下さい"}, {class: 'form-control'}) %>
+                      <% end %>
                     <% end %>
                   </div>
                 </div>
@@ -159,31 +229,33 @@
               
               <div class="center">
                 <div class= "col-md-12">
+                <% if @applying_month.month_request_status != "申請中" %>
                   <%= f.submit yield(:button_text), class: "btn btn-primary btn-#{yield(:class_text)} col-md-12" %>
+                <% elsif @applying_month.month_request_status == "申請中" %>
+                  <%= link_to "申請取消", destroy_month_apply_user_monthapply_path(@user, @applying_month, date: @first_day), method: :patch, data: { confirm: "#{ @applying_month.month_first_day.month}月分の申請を取り消してよろしいですか？" }, class: "btn btn-primary btn-#{yield(:class_text)} col-md-12" %>
+                <% end %>
                 </div>
               </div>
             <% end %>
-            <div class="center">
-              <div class= "col-md-12">
-                <% if @applying_month.month_request_status == "申請中" %>
-                  <%= link_to "申請取消", user_monthapply_path(@user, @applying_month, date: @first_day), method: :delete, data: { confirm: "#{ @applying_month.month_first_day.month}月分の申請を取り消してよろしいですか？" }, class: "btn btn-primary btn-#{yield(:class_text)} col-md-12" %>
-                <% end %>
-              </div>
-            </div>
           </td>
         </tr>
         
         <tr>
-          <td rowspan="3"><%= @attendances.count %></td>
-          <td rowspan="3"><%= format_basic_info(@user.work_time).to_f * @worked_sum %></td> <!-- to_fは文字列を浮動小数点数に変換 -->
+          <td rowspan="3"><%= @attendances.where.not(finished_at: nil).count %></td>
           <td rowspan="3"><%= format("%.2f", @total_working_times.to_f) %></td>
+          <td rowspan="3"><%= @attendances.where(over_request_status: "承認").count %></td>
+          <td rowspan="3"><%= format("%.2f", @total_over_times.to_f) %></td>
         </tr>
       </tfoot>
     </table>
   </div>
 </div>
 
-<!-- 残業申請モーダルウインドウ表示 -->
-<div id="overtime_apply" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true"></div>
 <!-- 勤怠承認モーダル表示(一ヶ月分) -->
 <div id="edit" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true"></div>
+<!-- 勤怠変更承認モーダル表示(一日分) -->
+<div id="edit_days_applying" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true"></div>
+<!-- 残業申請モーダルウインドウ表示 -->
+<div id="over_apply" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true"></div>
+<!-- 残業申請承認モーダルウインドウ表示 -->
+<div id="over_applying" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true"></div>

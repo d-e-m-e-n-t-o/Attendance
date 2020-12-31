@@ -1,0 +1,70 @@
+<% provide(:class_text, 'over-applying') %>
+<% provide(:button_text, '変更を送信する') %>
+
+<%= form_with(model: @user, url: attendances_update_over_applying_user_path(@user, date: @first_day), local: true, method: :patch) do |f| %>
+  <div class="modal-dialog modal-lg modal-dialog-center">
+    <div class="modal-content">
+      <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+        <span class="monthapplies-index-close", aria-hidden="true">&times;</span>
+      </button>
+      <% @over_applying.each do |id, items| %>
+      <% user = User.find(id) %>
+        <div class="modal-header">
+          <h1 class="modal-title"><%="【#{user.name}からの残業申請】" %></h1>
+        </div>
+        
+        <div class="modal-body">
+          <div class="row">
+            <div class="col-md-10 col-md-offset-1">
+              <table class="table table-bordered table-condensed table-hover" id="table-attendances">
+                <thead>
+                  <tr>
+                    <th>日付</th>
+                    <th>曜日</th>
+                    <th>終了予定時間</th>
+                    <th>指定勤務終了時間</th>
+                    <th>時間外時間</th>
+                    <th>業務処理内容</th>
+                    <th>指示者確認㊞</th>
+                    <th>変更欄</th>
+                    <th>詳細確認</th>
+                  </tr>
+                </thead>
+              
+                <% items.each do |item| %>
+                  <tbody>
+                    <tr>
+                      <%= f.fields_for "applying_update_over[]", item do |applying_update_over|%>
+                        <%= render 'shared/error_messages', object: @user %>
+                        <td><%= l(item.worked_on, format: :short) %></td>
+                        <td class='<%= "wday#{item.worked_on.wday}"%>'>
+                          <%= $days_of_the_week[item.worked_on.wday] %>
+                        </td>
+                        <td><%= l(item.over_end_at, format: :time) if item.over_end_at.present? %></td>
+                        <% if item.edit_day_finished_at.present? && item.edit_day_request_status == "承認" %>
+                          <td><%= l(item.edit_day_finished_at, format: :time) %></td>
+                        <% elsif item.finished_at.present?%>
+                          <td><%= l(item.finished_at, format: :time) %></td>
+                        <% else %>
+                          <td><%= l(user.designated_work_end_time, format: :time) if user.designated_work_end_time.present? %></td>
+                        <% end %>
+                        <td><%= over_times(item.id, item.over_end_at, item.finished_at, item.over_next_day) %></td>
+                        <td><%= item.over_note %></td>
+                        <td><%= applying_update_over.select(:over_request_status, [["なし", "なし"], ["承認", "承認"], ["否認", "否認"]], {include_blank: "選択して下さい"}, class: 'form-control') %></td>
+                        <td><%= applying_update_over.check_box :over_check_confirm, id: "remember-me" %></td>
+                        <td><%= link_to "確認", user_monthapply_path(user, item, date: @first_day, login_user: @user.id), method: :get, class: "btn btn-primary btn-attendance" %></td>
+                      <% end %>
+                    </tr>
+                  </tbody>
+                <% end %>
+              </table>
+            </div>
+          </div>
+        </div>
+      <% end %>
+      <div class="center monthapplies-index-btn">
+        <%= f.submit yield(:button_text), class: "btn btn-primary btn-#{yield(:class_text)}" %>
+      </div>
+    </div>
+  </div>
+<% end %>

@@ -8,17 +8,6 @@
   text-align: center;
 }
 
-/* Attendance_information_page_button */
-.btn-users-show {
-  margin-top: 10px;
-  margin-bottom: 10px;
-}
-
-.various-notices {
-  margin-top: 5px;
-  margin-bottom: 5px;
-}
-
 /* User_attendance_information_table */
 #table-attendances {
   th {
@@ -94,6 +83,12 @@
   margin-top: 8px;
   width: 100%;
 }
+
+.radio_button_edit {
+  padding-left: 20px;
+  display: inline-block;
+}
+
 
 /*削除ボタン横の縦線(擬似要素)
 .user-dlt-btn:before {

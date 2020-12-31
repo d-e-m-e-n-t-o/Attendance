@@ -1,6 +1,7 @@
 class ApplicationController < ActionController::Base
   protect_from_forgery with: :exception
   include SessionsHelper
+  include AttendancesHelper
   
   $days_of_the_week = %w{日 月 火 水 木 金 土}
   
@@ -9,18 +10,27 @@ class ApplicationController < ActionController::Base
     @last_day = @first_day.end_of_month # 対象月の終日を取得
     one_month = [*@first_day..@last_day] # 1ヶ月分のオブジェクトが代入された配列を定義
     @attendances = @user.attendances.where(worked_on: @first_day..@last_day).order(:worked_on)
+    @attendances.each do |attendanc|
+      if Date.current > attendanc[:worked_on] && attendanc[:edit_day_request_status] == "承認"
+        attendanc.update_attributes(started_at: attendanc.edit_day_started_at, finished_at: attendanc.edit_day_finished_at)
+      end
+    end
+    @attendances = @user.attendances.where(worked_on: @first_day..@last_day).order(:worked_on)
     unless one_month.count == @attendances.count
       ActiveRecord::Base.transaction do # トランザクションを開始
         one_month.each { |day| @user.attendances.create!(worked_on: day) } # 繰り返し処理により、1ヶ月分の勤怠データを生成
       end
       @attendances = @user.attendances.where(worked_on: @first_day..@last_day).order(:worked_on)
     end
+    unless Monthapply.exists?(month_first_day: @first_day, user_id: @user.id)
+      @user.monthapplies.build(month_first_day: @first_day).save
+    end
   rescue ActiveRecord::RecordInvalid # トランザクションによるエラーの分岐
     flash[:danger] = "ページ情報の取得に失敗しました、再アクセスしてください。"
     redirect_to root_url
   end
   
-    # ↓ before_action_filter ↓
+# ↓ before_action_filter ↓
     def set_user_id
       @user = User.find(params[:id])
     end

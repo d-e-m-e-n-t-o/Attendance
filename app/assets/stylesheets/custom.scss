@@ -143,16 +143,68 @@ p {
 /*applying_link*/
 
 .link-not-applying {
-color : black;
-pointer-events: none;
+  color : black;
+  pointer-events: none;
 }
 
 .link-applying {
   color : red;
 }
 
-.Information-display {
+.information-display {
   border: 3px solid red;
   color : red;
   pointer-events: none;
 }
+
+.day-not-apply-form {
+  pointer-events: none;
+}
+
+/*edit_day_apply_form*/
+.edit-day-apply-a {
+  color : red;
+  pointer-events: none;
+}
+
+/*Attendance_management_table*/
+.user-info-display {
+  padding-top: 1%;
+}
+
+.user-info-display-time {
+  padding-top: 4%;
+}
+
+.user-info-basic-time {
+  padding-top: 2%;
+}
+
+.user-info-first-day {
+  padding-top: 7%;
+}
+
+.applying-info {
+  border: 3px solid red;
+  color : red;
+  margin-bottom: 50%;
+}
+
+.attendance-management-btn {
+  margin-top: -10px;
+  margin-bottom: 10px;
+}
+
+/* Attendance_information_page_button */
+.btn-users-show {
+  margin-right: 10px;
+}
+
+.various-notices {
+  margin-top: -10px;
+  margin-bottom: 20px;
+}
+.various-notice {
+  margin-bottom: 5px;
+}
+  /*border: 1px solid black;*/

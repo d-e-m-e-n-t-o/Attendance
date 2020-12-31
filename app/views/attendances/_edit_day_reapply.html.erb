@@ -1,0 +1,64 @@
+<% provide(:class_text, 'edit_day_reapply') %>
+<% provide(:button_text, '変更を送信する') %>
+
+<div class="modal-dialog modal-lg modal-dialog-center">
+  <div class="modal-content">
+    <div class="modal-header">
+      <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+      <h1 class="modal-title">【勤怠変更再申請】</h1>
+    </div>
+    <div class="modal-body">
+      <div class="row">
+        <div class="col-md-10 col-md-offset-1">
+          <%= form_with(model: @user, url: attendances_update_edit_days_apply_user_path(@user, date: @first_day), local: true, method: :patch) do |f| %>
+            <table class="table table-bordered table-condensed table-hover" id="table-attendances">
+              <thead>
+                <tr>
+                  <th>日付</th>
+                  <th>曜日</th>
+                  <th>出勤時間</th>
+                  <th>退勤時間</th>
+                  <th>翌日</th>
+                  <th>在社時間</th>
+                  <th>変更申請理由</th>
+                  <th>指示書確認㊞</th>
+                </tr>
+              </thead>
+          
+              <tbody>
+                <%= f.fields_for "attendances[]", @attendance do |attendance|%>
+                  <%= render 'shared/error_messages', object: @user %>
+                  <td><%= l(@attendance.worked_on, format: :short) %></td>
+                  <td class='<%= "wday#{@attendance.worked_on.wday}"%>'>
+                    <%= $days_of_the_week[@attendance.worked_on.wday] %>
+                  </td>
+                  <td><%= attendance.time_field :edit_day_started_at, class: "form-control" %></td>
+                  <td><%= attendance.time_field :edit_day_finished_at, class: "form-control" %></td>
+                  <td><%= attendance.check_box :edit_next_day, id: "remember-me" %></td>
+                  <td>
+                    <% if @attendance.edit_day_started_at.present? && @attendance.edit_day_finished_at.present? %>
+                      <%= working_times(@attendance.edit_day_started_at, @attendance.edit_day_finished_at) %>
+                    <% end %>
+                  </td>
+                  <td><%= attendance.text_field :day_note, class: "form-control" %></td>
+                  <td><%= attendance.collection_select(:edit_day_request_superior, @superiors, :id, :name, {include_blank: "選択して下さい", selected: "選択して下さい"}, {class: 'form-control'}) %></td>
+                  <%= attendance.hidden_field :edit_day_request_status, :value => "申請中" %>
+                  <%= attendance.hidden_field :edit_day_check_confirm, :value => "0" %>
+                <% end %>
+              </tbody>
+            </table>
+            
+            <div class="center fixed-bottom">
+              <%= f.submit yield(:button_text), class: "btn btn-primary btn-#{yield(:class_text)}" %>
+              <button type="button" class="btn btn-default btn-<%= yield(:class_text) %>" data-dismiss="modal">
+                キャンセル
+              </button>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -2,6 +2,23 @@
   <%= render 'shared/error_messages', object: @user %>
   
   <%= f.label :name, class: "label-#{yield(:class_text)}" %>
+  
+  <%#debugger %>
+  
+  <label class="radio_button_edit">上長権限</label>
+  <%= f.radio_button :superior, :true, id: "superior_true" %>
+  <%= f.label :superior, "有", value: true, for: "superior_true" %>
+  
+  <%= f.radio_button :superior, :false, id: "superior_false" %>
+  <%= f.label :superior, "無", value: false, for: "superior_false" %>
+  
+  <label class="radio_button_edit">管理者権限</label>
+  <%= f.radio_button :admin, :true %>
+  <%= f.label :admin_true, "有", value: true %>
+  
+  <%= f.radio_button :admin, :false %>
+  <%= f.label :admin_false, "無", value: false %>
+  
   <%= f.text_field :name, class: "form-control" %>
   
   <%= f.label :email, class: "label-#{yield(:class_text)}" %>
