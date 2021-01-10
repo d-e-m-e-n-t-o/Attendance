@@ -6,7 +6,7 @@ class UsersController < ApplicationController
   before_action :set_one_month, only: :show
   
   def new
-    employee_number_temp = "#{User.last[:employee_number].to_i + 1}"
+    employee_number_temp = User.last.nil? ? "1" : "#{User.last[:employee_number].to_i + 1}"
     uid_temp = SecureRandom.urlsafe_base64
     while User.exists?(uid: uid_temp) do
       uid_temp = SecureRandom.urlsafe_base64
