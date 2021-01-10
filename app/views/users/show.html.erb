@@ -20,7 +20,7 @@
         </td>
         <td colspan="2">
           <div class="user-info-basic-time">
-            基本時間<%= format_basic_info(@user.basic_time) %>
+            基本時間<%= format_basic_info(@user.basic_work_time) %>
           </div>
         </td>
         <td>
@@ -70,11 +70,11 @@
 <% end %>
 
 <div class="attendance-management-btn">
-  <%= link_to "勤怠変更を申請", attendances_edit_days_apply_user_path(date: @first_day), class: "btn btn-primary btn-users-show" %>
+  <%= link_to "勤怠を編集", attendances_edit_days_apply_user_path(date: @first_day), class: "btn btn-primary btn-users-show" %>
   <%= link_to "CSV出力", user_attendances_path(@user, date: @first_day, format: :csv), class: "btn btn-primary btn-users-show" %>
-  <%= link_to "勤怠修正ログ (承認済)", attendances_approval_log_user_path(@user, date: @first_day), class: "btn btn-primary btn-users-show" %>
+  <%= link_to "勤怠修正ログ (承認済)", attendances_index_approval_user_path(@user, date: @first_day), class: "btn btn-primary btn-users-show" %>
   <% if @update_applying_count !=0 %>
-    <%= link_to "【各種申請中の勤怠に関するお知らせ #{@update_applying_count}件】", attendances_attendances_applying_update_index_user_path(@user, date: @first_day), class: "applying-info" %>
+    <%= link_to "【各種申請中の勤怠に関するお知らせ #{@update_applying_count}件】", attendances_update_index_applying_user_path(@user, date: @first_day), class: "applying-info" %>
   <% end %>
 </div>
 
@@ -144,18 +144,20 @@
             </td>
             <td>
               <% if day.started_at.present? && day.finished_at.present?%>
-                <%= spent_time = working_times(day.started_at, day.finished_at) %>
-                <% @total_working_times = @total_working_times.to_f + spent_time.to_f %>
+                <%= spent_time = day.edit_day_request_status == "承認" ? edit_working_times(day.edit_day_started_at, day.edit_day_finished_at, day.edit_next_day) : working_times(day.started_at, day.finished_at) %>
+                <% @total_working_second = @total_working_second.to_i + Tod::TimeOfDay.parse(spent_time).second_of_day.to_i %>
               <% end %>
             </td>
             <td><%= day.day_note %></td>
             <td><%= l(day.over_end_at, format: :hour) if day.over_end_at.present? %></td>
             <td><%= l(day.over_end_at, format: :min) if day.over_end_at.present? %></td>
             <td>
-              <% if day.over_end_at.present? && %>
-                <%= over_time = over_times(day.id, day.over_end_at, day.finished_at, day.over_next_day) %>
-                <% @total_over_times =  @total_over_times.to_f + over_time.to_f %>
-                <% @total_working_times = @total_working_times.to_f + over_time.to_f %>
+              <% if day.over_end_at.present?%>
+                <%= over_time = over_times(day.id) %>
+                <% if day.over_request_status == "承認" %>
+                  <% @total_over_second = @total_over_second.to_i + Tod::TimeOfDay.parse(over_time).second_of_day.to_i %>
+                  <% @total_working_second = @total_working_second.to_i + Tod::TimeOfDay.parse(over_time).second_of_day.to_i %>
+                <% end %>
               <% end %>
             </td>
             <td><%= day.over_note if day.over_request_status %></td>
@@ -242,9 +244,9 @@
         
         <tr>
           <td rowspan="3"><%= @attendances.where.not(finished_at: nil).count %></td>
-          <td rowspan="3"><%= format("%.2f", @total_working_times.to_f) %></td>
+          <td rowspan="3"><%= @total_working_second = total_working_times(@total_working_second) %></td>
           <td rowspan="3"><%= @attendances.where(over_request_status: "承認").count %></td>
-          <td rowspan="3"><%= format("%.2f", @total_over_times.to_f) %></td>
+          <td rowspan="3"><%= @total_over_second = total_working_times(@total_over_second) %></td>
         </tr>
       </tfoot>
     </table>

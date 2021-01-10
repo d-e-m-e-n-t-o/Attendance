@@ -1,10 +1,11 @@
 class AttendancesController < ApplicationController
-  before_action :set_user_id, only: [:edit_days_apply, :update_edit_days_apply, :edit_days_applying, :over_applying, :update_over_applyin, :attendances_applying_update_index, :approval_log]
+  before_action :set_user_id, only: [:edit_days_apply, :update_edit_days_apply, :edit_days_applying, :over_applying, :update_over_applying, :update_index_applying, :index_approval, :update_index_approval, :ajax]
   before_action :set_user_user_id, only: [:update, :destroy_edit_days_apply, :edit_day_reapply, :over_apply, :update_over_apply, :destroy_over_apply, :index]
   before_action :set_attendance, only: [:update, :destroy_edit_days_apply, :edit_day_reapply, :over_apply, :update_over_apply, :destroy_over_apply]
-  before_action :logged_in_user, only: [:update, :edit_days_apply]
-  before_action :set_one_month, only: [:edit_days_apply, :index, :approval_log]
-  before_action :admin_or_correct_user, only: [:update, :edit_days_apply, :update_edit_days_apply]
+  before_action :set_one_month, only: [:edit_days_apply, :index, :index_approval]
+  before_action :logged_in_user
+  before_action :correct_user, only: [:update, :edit_days_apply, :update_edit_days_apply, :destroy_edit_days_apply, :edit_day_reapply, :over_apply, :update_over_apply, :destroy_over_apply, :update_index_applying, :index, :index_approval, :update_index_approval, :ajax]
+  before_action :superior_user, only: [:edit_days_applying, :update_edit_days_applying, :over_applying, :update_over_applying]
 
 # ↓ 出勤登録 ↓
   UPDATE_ERROR_MSG = "勤怠登録に失敗しました。やり直してください。"
@@ -34,14 +35,14 @@ class AttendancesController < ApplicationController
   def update_edit_days_apply
     edit_days_apply_params.each do |id, item|
       attendance = Attendance.find(id)
-      if item[:edit_day_started_at].blank? && item[:edit_day_finished_at].blank? && item[:day_note].blank? && item[:edit_day_request_superior].blank?
-        flash[:info] = "出勤時間、退勤時間、変更理由、指示書確認㊞を入力し申請してください。" if item[:edit_day_request_status] == "申請中" && flash[:danger].blank? && flash[:warning].blank? && flash[:success].blank?
-      elsif item[:edit_day_started_at].blank? || item[:edit_day_finished_at].blank? || item[:day_note].blank? || item[:edit_day_request_superior].blank?
+      if item[:edit_day_started_at].blank? && item[:edit_day_finished_at].blank? && item[:edit_day_request_superior].blank?
+        flash[:info] = "出勤時間、退勤時間、指示書確認㊞を入力し申請してください。" if item[:edit_day_request_status] == "申請中" && flash[:danger].blank? && flash[:warning].blank? && flash[:success].blank?
+      elsif item[:edit_day_started_at].blank? || item[:edit_day_finished_at].blank? || item[:edit_day_request_superior].blank?
         flash.delete(:info)
         flash.delete(:success)
-        flash[:danger] = "#{l(attendance.worked_on, format: :long)}の勤怠変更申請は失敗しました。出勤時間 、退勤時間、変更理由、指示書確認㊞の全てが必要です。" if item[:edit_day_request_status] == "申請中"
+        flash[:danger] = "#{l(attendance.worked_on, format: :long)}の勤怠変更申請は失敗しました。出勤時間 、退勤時間、指示書確認㊞の全てが必要です。" if item[:edit_day_request_status] == "申請中"
       end
-      if item[:edit_day_started_at].present? && item[:edit_day_finished_at].present? && item[:day_note].present? && item[:edit_day_request_superior].present?
+      if item[:edit_day_started_at].present? && item[:edit_day_finished_at].present? && item[:edit_day_request_superior].present?
         if compare_verify_edit_apply_time?(id, item[:edit_day_started_at], item[:edit_day_finished_at], item[:edit_next_day])
           flash.delete(:info)
           flash.delete(:success)
@@ -61,7 +62,7 @@ class AttendancesController < ApplicationController
   
   def destroy_edit_days_apply
     if @attendance.edit_day_request_status == "申請中"
-      @attendance.update_attributes(edit_day_started_at: nil, edit_day_finished_at: nil, edit_next_day: nil, day_note: nil, edit_day_request_superior: nil, edit_day_request_status: "なし", edit_day_check_confirm: nil)
+      @attendance.update_attributes(edit_day_started_at: nil, edit_day_finished_at: nil, edit_next_day: nil, day_note: nil, edit_day_request_superior: nil, edit_day_request_status: "なし", edit_day_check_confirm: nil, started_at: @attendance.before_started_at, finished_at: @attendance.before_finished_at)
       flash[:success] = "勤怠変更申請を取り消しました。"
     else
       flash[:danger] = "上長より申請が取り消されました。" if @attendance.edit_day_request_status == "なし"
@@ -85,7 +86,7 @@ class AttendancesController < ApplicationController
     update_edit_days_applying_params.each do |id, item|
       attendance = Attendance.find(id)
       if item[:edit_day_request_status].present? && item[:edit_day_request_status] != "申請中" && item[:edit_day_check_confirm] == "1"
-        attendance.update_attributes(edit_day_started_at: nil, edit_day_finished_at: nil, edit_next_day: nil, day_note: nil, edit_day_request_status: "なし", edit_day_check_confirm: "1") if item[:edit_day_request_status] == "なし"
+        attendance.update_attributes(edit_day_started_at: nil, edit_day_finished_at: nil, edit_next_day: nil, day_note: nil, edit_day_request_status: "なし", edit_day_check_confirm: "1", edit_approval_day: nil) if item[:edit_day_request_status] == "なし"
         attendance.update_attributes(item)
         flash.delete(:info)
         flash[:success] = "勤怠の申請状態を変更しました。"
@@ -111,14 +112,14 @@ class AttendancesController < ApplicationController
   
   def update_over_apply
     @first_day = @attendance.worked_on.beginning_of_month
-    if over_params[:over_end_at].blank? && over_params[:over_note].blank? && over_params[:over_request_superior].blank?
-      flash[:info] = "終了予定時間、業務処理内容、指示書確認㊞を入力し申請してください。" if over_params[:over_request_status] == "申請中" && flash[:danger].blank? && flash[:warning].blank? && flash[:success].blank?
-    elsif over_params[:over_end_at].blank? || over_params[:over_note].blank? || over_params[:over_request_superior].blank?
+    if over_params[:over_end_at].blank?  && over_params[:over_request_superior].blank?
+      flash[:info] = "終了予定時間、指示書確認㊞を入力し申請してください。" if over_params[:over_request_status] == "申請中" && flash[:danger].blank? && flash[:warning].blank? && flash[:success].blank?
+    elsif over_params[:over_end_at].blank? || over_params[:over_request_superior].blank?
       flash.delete(:info)
       flash.delete(:success)
       flash[:danger] = "#{l(@attendance.worked_on, format: :long)}の残業申請に失敗しました。終了予定時間、業務処理内容、指示書確認㊞、の全てが必要です。" if over_params[:over_request_status] == "申請中"
     end
-    if over_params[:over_end_at].present? && over_params[:over_note].present? && over_params[:over_request_superior].present?
+    if over_params[:over_end_at].present? && over_params[:over_request_superior].present?
       if compare_verify_over_apply_time?(params[:id], over_params[:over_end_at], over_params[:over_next_day])
         flash.delete(:info)
         flash.delete(:success)
@@ -153,7 +154,7 @@ class AttendancesController < ApplicationController
     update_over_applying_params.each do |id, item|
     attendance = Attendance.find(id)
       if item[:over_request_status].present? && item[:over_request_status] != "申請中" && item[:over_check_confirm] == "1"
-        attendance.update_attributes(over_end_at: nil, over_next_day: nil, over_note: nil, over_request_status: "なし", over_check_confirm: "1") if item[:over_request_status] == "なし"
+        attendance.update_attributes(over_end_at: nil, over_next_day: nil, over_note: nil, over_request_status: "なし", over_check_confirm: "1", over_approval_day: nil) if item[:over_request_status] == "なし"
         attendance.update_attributes(item)
         flash.delete(:info)
         flash[:success] = "勤怠の申請状態を変更しました。"
@@ -170,7 +171,7 @@ class AttendancesController < ApplicationController
   end
   
 # ↓ 各種申請承認一覧↓
-  def attendances_applying_update_index
+  def update_index_applying
     @first_day = Date.current.beginning_of_month
     @monthapplies_update_applying = @user.monthapplies.where(month_check_confirm: true)
     @edit_day_update_applying = @user.attendances.where(edit_day_check_confirm: true)
@@ -191,13 +192,36 @@ class AttendancesController < ApplicationController
   end
 
 # ↓ 勤怠ログ ↓
-  def approval_log
-    @approved_attendances = @attendances.where("(edit_day_request_status = ?) OR (over_request_status = ?)", "承認", "承認")
-    approved_attendances = @user.attendances.where("(edit_day_request_status = ?) OR (over_request_status = ?)", "承認", "承認")
-    @year = approved_attendances.pluck(:worked_on).map{|day| day.year}.uniq
-    @month = approved_attendances.pluck(:worked_on).map{|day| day.month}.uniq
+  def index_approval
+    attendances_approved = @user.attendances.where("(edit_day_request_status = ?) OR (over_request_status = ?)", "承認", "承認")
+    @years = attendances_approved.pluck(:worked_on).map{|day| day.year}.uniq
   end
   
+  def update_index_approval
+    attendances_approved = @user.attendances.where("(edit_day_request_status = ?) OR (over_request_status = ?)", "承認", "承認")
+    @years = attendances_approved.pluck(:worked_on).map{|day| day.year}.uniq
+    @first_day = Date.parse("#{params[:year]}/#{params[:month]}/1")
+    @last_day = @first_day.end_of_month
+    @attendances_approved = @user.attendances.where(worked_on: @first_day..@last_day).where("(edit_day_request_status = ?) OR (over_request_status = ?)", "承認", "承認").order(:worked_on)
+    if params[:data] == "リセット"
+      @attendances_approved = nil
+    end
+  end
+  
+  def ajax
+    first_day = Date.parse("#{params[:year]}/1/1")
+    last_day = Date.parse("#{params[:year]}/12/31")
+    attendances_approved = @user.attendances.where("(edit_day_request_status = ?) OR (over_request_status = ?)", "承認", "承認")
+    @months = attendances_approved.where(worked_on: first_day..last_day).pluck(:worked_on).map{|day| day.month}.uniq if params[:year].present?
+    # ajax通信の記述:dataTypeの種類に応じて参照するファイルを切り替える.
+    # ajax記述には、dataType: 'json' と書かれているので
+    # ajax.json.jbuilderファイルが読み込まれる
+    respond_to do |format|
+      format.html
+      format.json
+    end
+  end
+
   private
   
     # 勤怠変更申請
@@ -208,7 +232,7 @@ class AttendancesController < ApplicationController
     
     # 勤怠申請承認
     def update_edit_days_applying_params
-      params.require(:user).permit(applying_update_edit_days: [:edit_day_request_status, :edit_day_check_confirm])[:applying_update_edit_days]
+      params.require(:user).permit(applying_update_edit_days: [:edit_day_request_status, :edit_day_check_confirm, :edit_approval_day])[:applying_update_edit_days]
     end
     
     # 残業申請
@@ -219,7 +243,7 @@ class AttendancesController < ApplicationController
     
     # 残業申請承認
     def update_over_applying_params
-      params.require(:user).permit(applying_update_over: [:over_request_status, :over_check_confirm])[:applying_update_over]
+      params.require(:user).permit(applying_update_over: [:over_request_status, :over_check_confirm, :over_approval_day])[:applying_update_over]
     end
     
     # csv出力

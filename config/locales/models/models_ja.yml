@@ -10,7 +10,7 @@ ja:
           name: 名前
           email: メールアドレス
           affiliation: 所属
-          basic_time: 基本勤務時間
+          basic_work_time: 基本勤務時間
           admin: 管理者
           superior: 上長
           employee_number: 社員番号

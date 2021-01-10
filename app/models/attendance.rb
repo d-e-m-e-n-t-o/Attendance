@@ -9,8 +9,8 @@ class Attendance < ApplicationRecord
   validate :edit_day_apply_items_for_required
   
   def edit_day_apply_items_for_required
-    if edit_day_started_at.blank? || edit_day_finished_at.blank? || day_note.blank? || edit_day_request_superior.blank?
-       errors.add(:edit_day_started_at, "、退勤時間、変更理由、指示書確認㊞の全てが入力されていない申請があります。") if edit_day_request_status == "申請中"
+    if edit_day_started_at.blank? || edit_day_finished_at.blank? ||  edit_day_request_superior.blank?
+       errors.add(:edit_day_started_at, "、退勤時間、指示書確認㊞の全てが入力されていない申請があります。") if edit_day_request_status == "申請中"
     end
   end
   
@@ -18,8 +18,8 @@ class Attendance < ApplicationRecord
   validate :edit_day_only_applying_invalid
   
   def edit_day_only_applying_invalid
-    if edit_day_started_at.blank? && edit_day_finished_at.blank? && day_note.blank? && edit_day_request_superior.blank?
-      errors.add(:edit_day_started_at,"、退勤時間、変更理由、指示書確認㊞を入力し申請してください。") if edit_day_request_status == "申請中"
+    if edit_day_started_at.blank? && edit_day_finished_at.blank? && edit_day_request_superior.blank?
+      errors.add(:edit_day_started_at,"、退勤時間、指示書確認㊞を入力し申請してください。") if edit_day_request_status == "申請中"
     end
   end
   
@@ -27,7 +27,7 @@ class Attendance < ApplicationRecord
   validate :edit_day_finished_at_next_end_check_required
   
   def edit_day_finished_at_next_end_check_required
-    if edit_day_request_status == "申請中" && edit_day_started_at.present? && edit_day_finished_at.present? && day_note.present? && edit_day_request_superior.present? && edit_next_day == false
+    if edit_day_request_status == "申請中" && edit_day_started_at.present? && edit_day_finished_at.present? && edit_day_request_superior.present? && edit_next_day == false
       errors.add(:edit_next_day, "のチェックが不要、または必要な申請があります。") if edit_day_started_at > edit_day_finished_at || edit_day_started_at == edit_day_finished_at
     end
   end
@@ -36,7 +36,7 @@ class Attendance < ApplicationRecord
   validate :edit_day_finished_at_not_next_end_not_check_required
   
   def edit_day_finished_at_not_next_end_not_check_required
-    if edit_day_request_status == "申請中" && edit_day_started_at.present? && edit_day_finished_at.present? && day_note.present? && edit_day_request_superior.present? && edit_next_day == true
+    if edit_day_request_status == "申請中" && edit_day_started_at.present? && edit_day_finished_at.present? && edit_day_request_superior.present? && edit_next_day == true
       errors.add(:edit_next_day, "のチェックが不要、または必要な申請があります。") if edit_day_started_at < edit_day_finished_at
     end
   end
@@ -59,8 +59,8 @@ class Attendance < ApplicationRecord
   validate :over_apply_items_for_required
   
   def over_apply_items_for_required
-    if over_end_at.blank? || over_note.blank? || over_request_superior.blank? || over_request_status.blank?
-      errors.add(:over_end_at, "、業務処理内容、指示書確認㊞、の全てが必要です。") if over_request_status == "申請中"
+    if over_end_at.blank? || over_request_superior.blank? || over_request_status.blank?
+      errors.add(:over_end_at, "、指示書確認㊞の全てが必要です。") if over_request_status == "申請中"
     end
   end
   
@@ -68,8 +68,8 @@ class Attendance < ApplicationRecord
   validate :over_only_applying_invalid
   
   def over_only_applying_invalid
-    if over_request_status == "申請中" && over_end_at.blank? && over_note.blank? && over_request_superior.blank?
-      errors.add(:over_end_at,"、退勤時間、変更理由、指示書確認㊞を入力し申請してください。")
+    if over_request_status == "申請中" && over_end_at.blank? && over_request_superior.blank?
+      errors.add(:over_end_at,"、退勤時間、指示書確認㊞を入力し申請してください。")
     end
   end
   
@@ -77,7 +77,7 @@ class Attendance < ApplicationRecord
   validate :over_apply_compare_verify_time_check_finished_at_nil_edit_day_request_status_other_than_approval
   
   def over_apply_compare_verify_time_check_finished_at_nil_edit_day_request_status_other_than_approval
-    if over_request_status == "申請中" && over_end_at.present? && over_note.present? && over_request_superior.present? && finished_at.nil? && edit_day_request_status != "承認"
+    if over_request_status == "申請中" && over_end_at.present? && over_request_superior.present? && finished_at.nil? && edit_day_request_status != "承認"
       user = User.find(user_id)
       if over_next_day == false
         errors.add(:over_next_day, "のチェックが不要、または必要な申請があります。") if user.designated_work_end_time.change(year:Date.current.year, month:Date.current.month, day:Date.current.day) > over_end_at || user.designated_work_end_time.change(year:Date.current.year, month:Date.current.month, day:Date.current.day) == over_end_at
@@ -91,7 +91,7 @@ class Attendance < ApplicationRecord
   validate :over_apply_compare_verify_time_check_finished_at_nil_edit_day_request_status_approval
   
   def over_apply_compare_verify_time_check_finished_at_nil_edit_day_request_status_approval
-    if over_request_status == "申請中" && over_end_at.present? && over_note.present? && over_request_superior.present? && finished_at.nil? && edit_day_request_status == "承認"
+    if over_request_status == "申請中" && over_end_at.present? && over_request_superior.present? && finished_at.nil? && edit_day_request_status == "承認"
       if over_next_day == false
         errors.add(:over_next_day, "のチェックが不要、または必要な申請があります。") if edit_day_finished_at.change(year:Date.current.year, month:Date.current.month, day:Date.current.day) > over_end_at || edit_day_finished_at.change(year:Date.current.year, month:Date.current.month, day:Date.current.day) == over_end_at
       elsif over_next_day == true
@@ -104,7 +104,7 @@ class Attendance < ApplicationRecord
   validate :over_apply_compare_verify_time_check_finished_at_present
   
   def over_apply_compare_verify_time_check_finished_at_present
-    if over_request_status == "申請中" && over_end_at.present? && over_note.present? && over_request_superior.present? && finished_at.present?
+    if over_request_status == "申請中" && over_end_at.present? && over_request_superior.present? && finished_at.present?
       if over_next_day == false
         errors.add(:over_next_day, "のチェックが不要、または必要な申請があります。") if finished_at.change(year:Date.current.year, month:Date.current.month, day:Date.current.day) > over_end_at || finished_at.change(year:Date.current.year, month:Date.current.month, day:Date.current.day) == over_end_at
       end

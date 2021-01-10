@@ -1,0 +1,10 @@
+<% provide(:title, @user.name) %>
+<% provide(:class_text, 'attendance-log') %>
+<% provide(:button_text, 'ログ取得') %>
+<h1>勤怠ログ</h1>
+  <div class="row">
+    <% @year %>
+    <% @user %>
+    <% @attendances_approved %>
+    <%= render 'approval_form' %>
+  </div>

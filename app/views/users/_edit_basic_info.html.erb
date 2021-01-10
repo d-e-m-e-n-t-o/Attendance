@@ -3,8 +3,6 @@
   
   <%= f.label :name, class: "label-#{yield(:class_text)}" %>
   
-  <%#debugger %>
-  
   <label class="radio_button_edit">上長権限</label>
   <%= f.radio_button :superior, :true, id: "superior_true" %>
   <%= f.label :superior, "有", value: true, for: "superior_true" %>
@@ -36,8 +34,8 @@
   <%= f.label :password, class: "label-#{yield(:class_text)}" %>
   <%= f.password_field :password, class: "form-control" %>
   
-  <%= f.label :basic_time, class: "label-#{yield(:class_text)}" %>
-  <%= f.time_field :basic_time, class: "form-control" %>
+  <%= f.label :basic_work_time, class: "label-#{yield(:class_text)}" %>
+  <%= f.time_field :basic_work_time, class: "form-control" %>
   
   <%= f.label :designated_work_start_time, class: "label-#{yield(:class_text)}" %>
   <%= f.time_field :designated_work_start_time, class: "form-control" %>

@@ -9,7 +9,7 @@
 # coding: utf-8
 
 User.create!(name: "上長A",
-             email: "sample1@email.com",
+             email: "sample-1@email.com",
              password: "password",
              password_confirmation: "password",
              employee_number: "1",
@@ -57,9 +57,9 @@ User.create!(name: "管理者C",
              admin: true)
 
 
-(6..20).each do |n|
+(6..19).each do |n|
   name  = Faker::Name.name
-  email = "sample#{n+1}@email.com"
+  email = "sample-#{n+1}@email.com"
   password = "password"
   employee_number = "#{n+1}"
   uid = SecureRandom.urlsafe_base64

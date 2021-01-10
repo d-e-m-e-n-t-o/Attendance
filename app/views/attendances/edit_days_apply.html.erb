@@ -1,7 +1,7 @@
 <% provide(:title, @user.name) %>
 <%= form_with(model: @user, url: attendances_update_edit_days_apply_user_path(date: @first_day), local: true, method: :patch) do |f| %>
   <h1>勤怠変更申請画面</h1>
-  <a class = "edit-day-apply-a">承認または否認された日付を再申請する場合、申請状況の再申請ボタンより申請を行ってください。</a>
+  <a class = "edit-day-apply-a">※承認または否認された日付を再申請する場合、申請状況の再申請ボタンより申請を行ってください。</a>
   <div class="container">
     <div class="row">
       <table class="table table-bordered table-condensed table-hover" id="table-attendances">
@@ -13,7 +13,7 @@
             <th>退勤時間</th>
             <th>翌日</th>
             <th>在社時間</th>
-            <th>変更申請理由</th>
+            <th>備考</th>
             <th>指示書確認㊞</th>
             <th>申請状況</th>
           </tr>
@@ -38,7 +38,7 @@
                   <% end %>
                 <td>
                   <% if day.edit_day_started_at.present? && day.edit_day_finished_at.present? %>
-                    <%= working_times(day.edit_day_started_at, day.edit_day_finished_at) %>
+                    <%= edit_working_times(day.edit_day_started_at, day.edit_day_finished_at, day.edit_next_day) %>
                   <% end %>
                 </td>
                 <td><%= attendance.text_field :day_note, class: "#{day.edit_day_request_status == "申請中" || day.edit_day_request_status == "承認" || day.edit_day_request_status == "否認" ? "day-not-apply-form form-control" : "form-control"}" %></td>

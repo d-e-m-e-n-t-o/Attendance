@@ -8,7 +8,7 @@ class CreateUsers < ActiveRecord::Migration[5.1]
       t.boolean :admin, default: false
       t.boolean :superior, default: false
       t.string :affiliation
-      t.datetime :basic_time, default: Time.current.change(hour: 7, min: 0, sec: 0)
+      t.datetime :basic_work_time, default: Time.current.change(hour: 7, min: 0, sec: 0)
       t.datetime :designated_work_start_time, default: Time.current.change(hour: 9, min: 0, sec: 0)
       t.datetime :designated_work_end_time, default: Time.current.change(hour: 17, min: 0, sec: 0)
       t.string :employee_number

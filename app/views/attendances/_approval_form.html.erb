@@ -1,0 +1,76 @@
+<a class="edit-day-apply-a">※勤怠が承認された年月のみ選択肢に表示されます。</a>
+<%= form_with(url: attendances_update_index_approval_user_path(@user), local: true, method: :get) do |f| %>
+  <div class="attendances_log_item">
+    <div class="form-horizontal" role="form">
+      <div class="form-group">
+        <div class="col-xs-1">
+          <%= f.label :year, '年', class: 'control-label' %>
+        </div>
+        <div class="col-xs-8">
+          <%= f.select(:year, @years, {include_blank: "選択して下さい"}, class: 'form-control', id: 'year', data: { user: "#{@user.id}"}) %>
+        </div>
+      </div>
+      <div class="form-group">
+        <div class="col-xs-1">
+          <%= f.label :month, '月', class: 'control-label' %>
+        </div>
+        <div class="col-xs-8 select-month">
+          <%= f.select(:month, "", {include_blank: ""}, class: "form-control", disabled: "disabled", id: 'month') %>
+        </div>
+      </div>
+      <%= f.submit yield(:button_text), class: "btn btn-primary btn-#{yield(:class_text)}" %>
+      <%= link_to "リセット", attendances_index_approval_user_path(@user, data: "リセット"), class: "btn btn-default btn-#{yield(:class_text)}" %>
+    </div>
+  </div>
+  <%if @attendances_approved.present? %>
+    <table class="table table-bordered table-condensed table-hover" id="table-attendances">
+      <thead>
+        <tr>
+          <th>日付</th>
+          <th>曜日</th>
+          <th>変更前出社時間</th>
+          <th>変更前退社時間</th>
+          <th>変更後出社時間</th>
+          <th>変更後退社時間</th>
+          <th>残業終了予定時間</th>
+          <th>指示者</th>
+          <th>承認日</th>
+        </tr>
+      </thead>
+          
+      <tbody>
+        <% @attendances_approved.each do |day| %>
+        <% day_applying_superior = User.find_by(id: day.edit_day_request_superior) %>
+        <% over_applying_superior = User.find_by(id: day.over_request_superior) %>
+          <tr>
+            <td><%= l(day.worked_on, format: :short) %></td>
+            <td class='<%= "wday#{day.worked_on.wday}"%>'>
+              <%= $days_of_the_week[day.worked_on.wday] %>
+            </td>
+            <td><%= l(day.before_started_at, format: :time) if day.before_started_at.present? %></td>
+            <td><%= l(day.before_finished_at, format: :time) if day.before_finished_at.present? %></td>
+            <td><%= l(day.edit_day_started_at, format: :time) if day.edit_day_started_at.present? %></td>
+            <td><%= l(day.edit_day_finished_at, format: :time) if day.edit_day_finished_at.present? %></td>
+            <td><%= l(day.over_end_at, format: :time) if day.over_end_at.present? %></td>
+            <td>
+              <div class="approval-log">
+                <label class="approval-label"><%= "勤怠編集：#{day_applying_superior.name}" if day_applying_superior.present? && day.edit_day_request_status == "承認" %></label>
+              </div>
+              <div class="approval-log">
+                <label class="approval-label"><%= "残業申請：#{over_applying_superior.name}" if over_applying_superior.present? && day.over_request_status == "承認" %></label>
+              </div>
+            </td>
+            <td>
+              <div class="approval-log">
+                <label class="approval-label"><%= "勤怠編集：#{l(day.edit_approval_day, format: :short)}" if day.edit_approval_day.present? && day.edit_day_request_status == "承認" %></label></br>
+              </div>
+              <div class="approval-log">
+                <label class="approval-label"><%= "残業申請：#{l(day.over_approval_day, format: :short)}" if day.over_approval_day.present? && day.over_request_status == "承認" %></label>
+              </div>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  <% end %>
+<% end %>

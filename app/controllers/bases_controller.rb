@@ -1,7 +1,7 @@
 class BasesController < ApplicationController
   before_action :set_base, only: [:destroy, :update_type, :edit, :update]
-  before_action :logged_in_user, only: [:index, :new, :create, :destroy]
-  before_action :admin_user, only: [:index, :new, :create, :destroy]
+  before_action :logged_in_user
+  before_action :admin_user
   
   def index
     @bases = Base.all.order(:number)
@@ -58,7 +58,7 @@ class BasesController < ApplicationController
     flash[:success] = "#{@base.name}の情報を修正しました。"
     redirect_to bases_path
   rescue ActiveRecord::RecordInvalid
-    flash[:danger] = "修正される項目のデータが既に存在しています。"
+    flash[:danger] = @base.errors.full_messages.join
     redirect_to bases_path
   end
   

@@ -32,7 +32,7 @@
 
 <div class="container">
   <div class="row">
-    <div class="col-md-11 col-md-offset-1"><%= will_paginate %></div>
+    <div data-turbolinks="false", class="col-md-11 col-md-offset-1"><%= will_paginate %></div>
       <table class="table table-condensed table-hover" id="table-users">
         <tbody>
           <% @users.each do |user| %>
@@ -61,6 +61,6 @@
           <% end %>
         </tbody>
       </table>
-    <div class="col-md-11 col-md-offset-1"><%= will_paginate %></div>
+    <div data-turbolinks="false", class="col-md-11 col-md-offset-1"><%= will_paginate %></div>
   </div>
 </div>

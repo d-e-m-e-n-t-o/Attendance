@@ -1,4 +1,6 @@
 module AttendancesHelper
+  
+  # 出退勤ボタンの文字列を切替
   def attendance_state(attendance)
     if Date.current == attendance.worked_on
       return '出勤' if attendance.started_at.nil?
@@ -7,10 +9,19 @@ module AttendancesHelper
     false
   end
   
-  # 在社時間を計算(時間オブジェクトの計算結果は秒数となる。)
+  # 在社時間を計算(勤怠)
   def working_times(start, finish)
-    spe_time = format("%.2f", (((finish - start) / 60) / 60.0))
-    start < finish ? spe_time : format("%.2f",spe_time.to_f + 24)
+    sta_at = Tod::TimeOfDay.parse(format("%.2d", start.hour) + ":" + format("%.2d", start.min))
+    fin_at = Tod::TimeOfDay.parse(format("%.2d", finish.hour) + ":" + format("%.2d", finish.min))
+    (fin_at - sta_at).strftime("%H:%M")
+  end
+  
+  # 在社時間を計算(勤怠変更)
+  def edit_working_times(start, finish, check)
+    sta_at = Tod::TimeOfDay.parse(format("%.2d", start.hour) + ":" + format("%.2d", start.min))
+    fin_at = Tod::TimeOfDay.parse(format("%.2d", finish.hour) + ":" + format("%.2d", finish.min))
+    spe_time = fin_at - sta_at
+    fin_at == sta_at && check == true ? (format("%.2d", spe_time.hour + 24) + ":" + format("%.2d", spe_time.min)) : spe_time.strftime("%H:%M")
   end
   
   # 勤怠変更申請の出勤時間と退勤時間を比較検証。(minも考慮しTod::TimeOfDayで時刻にパースする。)
@@ -25,7 +36,7 @@ module AttendancesHelper
     end
   end
   
-    # 残業申請の終了予定時間と退勤時間を比較検証。
+  # 残業申請の終了予定時間と退勤時間を比較検証。
   def compare_verify_over_apply_time?(id, over, check)
     attendance = Attendance.find(id)
     user = User.find_by(id: attendance[:user_id])
@@ -39,12 +50,26 @@ module AttendancesHelper
     end
   end
   
+  # 累計在社時間を計算。
+  def total_working_times(second)
+    hour = 0
+    second = 0 if second.nil?
+    min = second / 60
+    if min >= 60
+      hour = min / 60
+      min = min % 60
+    end
+    "#{hour}" + ":" + format("%.2d", min)
+  end
+  
   # 時間外時間を計算
-  def over_times(id, over, finish, check)
+  def over_times(id)
     attendance = Attendance.find(id)
-    finish = finish.nil? && attendance.edit_day_request_status == "承認" ? attendance.edit_day_finished_at : finish
-    finish = finish.nil? ? @user.designated_work_end_time : finish
-    ove_time = format("%.2f", ((((over.hour - finish.hour) * 60) + (over.min - finish.min)) / 60.0))
-    check == false ?  ove_time : format("%.2f",ove_time.to_f + 24)
+    finish = attendance.edit_day_request_status == "承認" ? attendance.edit_day_finished_at : attendance.finished_at
+    finish = @user.designated_work_end_time if finish.nil?
+    finish = Tod::TimeOfDay.parse(format("%.2d", finish.hour) + ":" + format("%.2d", finish.min))
+    over = Tod::TimeOfDay.parse(format("%.2d", attendance.over_end_at.hour) + ":" + format("%.2d", attendance.over_end_at.min))
+    ove_time = (over - finish)
+    finish == over && attendance.over_next_day == true ? (format("%.2d", ove_time.hour + 24) + ":" + format("%.2d", ove_time.min)) : ove_time.strftime("%H:%M")
   end
 end

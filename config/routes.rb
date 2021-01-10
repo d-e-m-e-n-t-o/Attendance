@@ -8,6 +8,7 @@ Rails.application.routes.draw do
   
   # ログイン機能
   get '/login', to: 'sessions#new' 
+  get '/ajax', to: 'attendances#ajax'
   post '/login', to: 'sessions#create' 
   delete '/logout', to: 'sessions#destroy' 
   
@@ -17,14 +18,15 @@ Rails.application.routes.draw do
       patch 'update_basic_info'
       get 'attendances/edit_days_apply'
       get 'attendances/edit_days_applying'
-      get 'attendances/attendances_applying_update_index'
+      get 'attendances/update_index_applying'
       patch 'attendances/update_edit_days_applying'
       patch 'attendances/update_edit_days_apply'
       get 'attendances/over_applying'
       patch 'attendances/update_over_applying'
       get 'get_commuting_list'
       patch 'monthapplies/applying_update'
-      get 'attendances/approval_log'
+      get 'attendances/index_approval'
+      get 'attendances/update_index_approval'
     end
     resources :attendances do
       member do

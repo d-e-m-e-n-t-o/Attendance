@@ -2,6 +2,9 @@ class MonthappliesController < ApplicationController
   before_action :set_user_user_id, only: [:update, :destroy, :edit, :show]
   before_action :set_applying_month, only: [:update, :destroy]
   before_action :set_one_month, only: :show
+  before_action :logged_in_user
+  before_action :correct_user, only: [:update, :destroy_month_apply]
+  before_action :superior_user, only: [:edit, :applying_update, :show]
   
 # ↓ 勤怠申請 ↓
   def update
