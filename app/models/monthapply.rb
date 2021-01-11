@@ -3,7 +3,6 @@ class Monthapply < ApplicationRecord
   
 # ↓ month_apply_validates ↓
   validates :month_first_day, presence: true, uniqueness: { scope: :user_id }
-  validates :month_request_superior, presence: true, on: :update
 
 # ↓ change_month_request_status_validates ↓
 

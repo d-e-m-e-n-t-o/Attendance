@@ -1,6 +1,6 @@
 class MonthappliesController < ApplicationController
-  before_action :set_user_user_id, only: [:update, :destroy, :edit, :show]
-  before_action :set_applying_month, only: [:update, :destroy]
+  before_action :set_user_user_id, only: [:update, :destroy_month_apply, :edit, :show]
+  before_action :set_applying_month, only: [:update, :destroy_month_apply]
   before_action :set_one_month, only: :show
   before_action :logged_in_user
   before_action :correct_user, only: [:update, :destroy_month_apply]
@@ -24,7 +24,7 @@ class MonthappliesController < ApplicationController
   
   def destroy_month_apply
     if @applying_month[:month_request_status] == "申請中"
-      @attendance.update_attributes(over_end_at: nil, over_next_day: nil, over_note: nil, over_request_superior: nil, over_request_status: "なし", over_check_confirm: nil)
+      @applying_month.update_attributes(month_request_superior: nil, month_request_status: "なし", month_check_confirm: nil)
       flash[:success] = "#{@applying_month.month_first_day.month}月の申請を取り消しました。"
     else
       flash[:danger] = "上長より申請が取り消されました。" if @applying_month.month_request_status == "なし"
@@ -42,7 +42,7 @@ class MonthappliesController < ApplicationController
     month_applying_update_params.each do |id, item|
       month = Monthapply.find(id)
       if item[:month_request_status].present? && item[:month_request_status] != "申請中" && item[:month_check_confirm] == "1"
-        month.update_attributes(month_first_day: nil, month_request_superior: item.month_request_superior, month_request_status: "なし", month_check_confirm: "1") if item[:month_request_status] == "なし"
+        month.update_attributes(month_request_status: "なし", month_check_confirm: "1") if item[:month_request_status] == "なし"
         month.update_attributes(item)
         flash.delete(:info)
         flash[:success] = "勤怠の申請状態を変更しました。"
