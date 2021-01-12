@@ -49,14 +49,14 @@
                 <a style="color: black;">|<a>
                 <%= link_to "削除", user, method: :delete,data: { confirm: "#{user.name}を削除してよろしいですか？" }, class: "btn btn-primary user-dlt-btn" %>
               </div>
-              <div class="col-md-12 bg-edit-button">
-              <button type="button" class="btn btn-primary" data-toggle="collapse" data-target="#<%= "#{user.id}" %>">編集</button>
-                <div id="<%= "#{user.id}" %>" class="collapse">
-                  <% @user = user %>
-                  <%= render 'edit_basic_info' %>
-                </div>
-              </div>
             <% end %>
+            <div class="col-md-12 bg-edit-button">
+              <button type="button" class="btn btn-primary" data-toggle="collapse" data-target="#<%= "#{user.id}" %>">編集</button>
+              <div id="<%= "#{user.id}" %>" class="collapse">
+                <% @user = user %>
+                <%= render 'edit_basic_info' %>
+              </div>
+            </div>
           <% end %>
         </tbody>
       </table>

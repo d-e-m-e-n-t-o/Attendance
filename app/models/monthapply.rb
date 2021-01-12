@@ -3,6 +3,15 @@ class Monthapply < ApplicationRecord
   
 # ↓ month_apply_validates ↓
   validates :month_first_day, presence: true, uniqueness: { scope: :user_id }
+  
+  # 勤怠を申請中のみでの申請は無効
+  validate :month_only_applying_invalid
+  
+  def month_only_applying_invalid
+    if month_request_superior.blank?
+      errors.add(:edit_day_started_at,"、退勤時間、指示書確認㊞を入力し申請してください。") if month_request_status == "申請中"
+    end
+  end
 
 # ↓ change_month_request_status_validates ↓
 

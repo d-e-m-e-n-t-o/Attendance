@@ -4,7 +4,7 @@ class AttendancesController < ApplicationController
   before_action :set_attendance, only: [:update, :destroy_edit_days_apply, :edit_day_reapply, :over_apply, :update_over_apply, :destroy_over_apply]
   before_action :set_one_month, only: [:edit_days_apply, :index, :index_approval]
   before_action :logged_in_user
-  before_action :correct_user, only: [:update, :edit_days_apply, :update_edit_days_apply, :destroy_edit_days_apply, :edit_day_reapply, :over_apply, :update_over_apply, :destroy_over_apply, :update_index_applying, :index, :index_approval, :update_index_approval, :ajax]
+  before_action :superior_or_correct_user, only: [:update, :edit_days_apply, :update_edit_days_apply, :destroy_edit_days_apply, :edit_day_reapply, :over_apply, :update_over_apply, :destroy_over_apply, :update_index_applying, :index, :index_approval, :update_index_approval, :ajax]
   before_action :superior_user, only: [:edit_days_applying, :update_edit_days_applying, :over_applying, :update_over_applying]
 
 # ↓ 出勤登録 ↓

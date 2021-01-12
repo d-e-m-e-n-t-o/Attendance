@@ -60,6 +60,15 @@ class ApplicationController < ActionController::Base
         redirect_to(root_url)
       end  
     end
+    
+    # 管理権限者以外を許可
+    def superior_or_correct_user
+      @user = User.find(params[:id]) if @user.blank?
+      unless !current_user.admin?
+        flash[:danger] = "編集権限がありません。"
+        redirect_to(root_url)
+      end  
+    end
 
     # アクセスしたユーザーが現在ログイン中か確認
     def correct_user
