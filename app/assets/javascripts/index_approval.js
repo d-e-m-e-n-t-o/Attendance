@@ -10,6 +10,8 @@ $(document).on('turbolinks:load', function(){
     var year = $(this).val();
     const user = $(this).data('user');
     
+    console.log(year);
+    
     if(year == ""){
       $('#month').attr('disabled', 'disabled');
     }else{
