@@ -37,7 +37,7 @@
           <th>承認日</th>
         </tr>
       </thead>
-          
+
       <tbody>
         <% @attendances_approved.each do |day| %>
         <% day_applying_superior = User.find_by(id: day.edit_day_request_superior) %>

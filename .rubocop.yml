@@ -1,0 +1,254 @@
+# 追加した規約ファイル読込
+require:
+  - rubocop-rails
+
+AllCops:
+  # Rubyバージョン指定
+  TargetRubyVersion: 2.7
+
+  # RubyStyleGuideとRuboCopを連携
+  DisplayStyleGuide: true
+
+  # RubyStyleGuide日本語版を使用
+  StyleGuideBaseURL: https://github.com/fortissimo1997/ruby-style-guide/blob/japanese/README.ja.md
+
+  # 保留中のすべてのCopsを一括で有効
+  NewCops: enable
+
+  # 除外
+  Exclude:
+    - 'config.ru'
+    - 'bin/**'
+    - 'lib/**'
+    - 'db/**/*'
+    - 'config/**/*'
+    - 'script/**/*'
+    - 'vendor/**/*'
+    - !ruby/regexp /old_and_unused\.rb$/
+
+# 日本語でのコメントを許可
+AsciiComments:
+  Enabled: false
+
+# クラスのコメント必須を無視
+Documentation:
+  Enabled: false
+
+# モジュール名::クラス名の定義を許可
+ClassAndModuleChildren:
+  Enabled: false
+
+# 文字リテラルのイミュータブル宣言を無視（freezeになるのはRuby3以降）
+Style/FrozenStringLiteralComment:
+  Enabled: false
+
+# Rails 用に最適化されたモードを有効
+Rails:
+  Enabled: true
+
+# `and return` の形式を利用を許可、基本的には、&& と || を使用
+Style/AndOr:
+  Enabled: false
+
+# インデントのスタイルを指定
+Layout/IndentationConsistency:
+  EnforcedStyle: indented_internal_methods
+
+# コメントのインデントチェックを無効
+Layout/CommentIndentation:
+  Enabled: false
+
+# 属性アクセサーまたはそれらのグループの後に改行をチェック
+Layout/EmptyLinesAroundAttributeAccessor:
+  Enabled: true
+
+# メソッド呼び出し演算子をチェックして、周囲にスペースがないことを確認
+Layout/SpaceAroundMethodCallOperator:
+  Enabled: true
+
+# OpenSSLのアルゴリズム定数に関する設定
+Lint/DeprecatedOpenSSLConstant:
+  Enabled: true
+
+# 暗黙的な名前空間となるモジュール名を指定
+Lint/RaiseException:
+  Enabled: true
+
+# 予期しないオーバーライドをチェック
+Lint/StructNewOverride:
+  Enabled: true
+
+# ソースコードの行の長さをチェック
+Layout/LineLength:
+  Max: 150
+
+Metrics/AbcSize:
+  Max: 50
+  Exclude:
+    - 'lib/tasks/dev.rake'
+
+Metrics/BlockLength:
+  CountComments: false
+  Exclude:
+    - 'Guardfile'
+    - 'config/routes.rb'
+    - 'spec/**/*'
+    - 'app/views/**/*.jbuilder'
+    - 'lib/tasks/dev.rake'
+
+Metrics/ClassLength:
+  CountComments: false
+
+Metrics/MethodLength:
+  CountComments: false
+  Enabled: false
+  # Max: 15
+  # Exclude:
+  #   - 'lib/tasks/dev.rake'
+
+Metrics/ModuleLength:
+  CountComments: false
+
+Naming/FileName:
+  Exclude:
+    - 'Gemfile'
+    - 'Guardfile'
+
+Naming/MethodParameterName:
+  AllowedNames: [e]
+
+# RSpec/ContextWording:
+#   Enabled: false
+
+# RSpec/DescribedClass:
+#   Enabled: false
+
+# RSpec/ExampleLength:
+#   Enabled: false
+
+# RSpec/ExpectInHook:
+#   Enabled: false
+
+# # An instance variable can be used when needed, but use let when possible.
+# RSpec/InstanceVariable:
+#   Enabled: false
+
+# RSpec/MessageSpies:
+#   Enabled: false
+
+# RSpec/MultipleExpectations:
+#   Enabled: false
+
+# RSpec/NestedGroups:
+#   Max: 5
+
+Style/BlockComments:
+  Exclude:
+    - 'spec/spec_helper.rb'
+
+# https://rubocop.readthedocs.io/en/stable/cops_style/#styleblockdelimiters
+Style/BlockDelimiters:
+  EnforcedStyle: braces_for_chaining
+  Exclude:
+    - 'spec/**/*'
+
+Style/ClassAndModuleChildren:
+  Enabled: false
+
+Style/Documentation:
+  Enabled: false
+
+# https://rubocop.readthedocs.io/en/stable/cops_style/#styleexponentialnotation
+Style/ExponentialNotation:
+  Enabled: true
+
+# https://rubocop.readthedocs.io/en/stable/cops_style/#stylehasheachmethods
+Style/HashEachMethods:
+  Enabled: true
+
+# https://rubocop.readthedocs.io/en/stable/cops_style/#stylehashtransformkeys
+Style/HashTransformKeys:
+  Enabled: true
+
+# https://rubocop.readthedocs.io/en/stable/cops_style/#stylehashtransformvalues
+Style/HashTransformValues:
+  Enabled: true
+
+Style/IfUnlessModifier:
+  Enabled: false
+
+Style/Lambda:
+  EnforcedStyle: literal
+
+Style/RegexpLiteral:
+  Enabled: false
+
+# https://rubocop.readthedocs.io/en/stable/cops_style/#styleslicingwithrange
+Style/SlicingWithRange:
+  Enabled: true
+
+Layout/SpaceBeforeBrackets: # (new in 1.7)
+  Enabled: true
+
+Lint/AmbiguousAssignment: # (new in 1.7)
+  Enabled: true
+
+Lint/DeprecatedConstants: # (new in 1.8)
+  Enabled: true
+
+Lint/DuplicateBranch: # (new in 1.3)
+  Enabled: true
+
+Lint/DuplicateRegexpCharacterClassElement: # (new in 1.1)
+  Enabled: true
+
+Lint/EmptyBlock: # (new in 1.1)
+  Enabled: true
+
+Lint/EmptyClass: # (new in 1.3)
+  Enabled: true
+
+Lint/LambdaWithoutLiteralBlock: # (new in 1.8)
+  Enabled: true
+
+Lint/NoReturnInBeginEndBlocks: # (new in 1.2)
+  Enabled: true
+
+Lint/RedundantDirGlobSort: # (new in 1.8)
+  Enabled: true
+
+Lint/ToEnumArguments: # (new in 1.1)
+  Enabled: true
+
+Lint/UnexpectedBlockArity: # (new in 1.5)
+  Enabled: true
+
+Lint/UnmodifiedReduceAccumulator: # (new in 1.1)
+  Enabled: true
+
+Style/ArgumentsForwarding: # (new in 1.1)
+  Enabled: true
+
+Style/CollectionCompact: # (new in 1.2)
+  Enabled: true
+
+Style/DocumentDynamicEvalDefinition: # (new in 1.1)
+  Enabled: true
+
+Style/EndlessMethod: # (new in 1.8)
+  Enabled: true
+
+Style/HashExcept: # (new in 1.7)
+  Enabled: true
+
+Style/NegatedIfElseCondition: # (new in 1.2)
+  Enabled: true
+
+Style/NilLambda: # (new in 1.3)
+  Enabled: true
+
+Style/RedundantArgument: # (new in 1.4)
+  Enabled: true
+
+Style/SwapValues: # (new in 1.1)
+  Enabled: true

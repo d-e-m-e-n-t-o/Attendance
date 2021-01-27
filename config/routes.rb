@@ -1,17 +1,16 @@
 Rails.application.routes.draw do
-  
   # トップページ
   root 'static_pages#top'
-  
+
   # ユーザー新規登録
   get '/signup', to: 'users#new'
-  
+
   # ログイン機能
-  get '/login', to: 'sessions#new' 
+  get '/login', to: 'sessions#new'
   get '/ajax', to: 'attendances#ajax'
-  post '/login', to: 'sessions#create' 
-  delete '/logout', to: 'sessions#destroy' 
-  
+  post '/login', to: 'sessions#create'
+  delete '/logout', to: 'sessions#destroy'
+
   resources :users do
     member do
       get 'edit_basic_info'
@@ -42,13 +41,12 @@ Rails.application.routes.draw do
         patch 'destroy_month_apply'
       end
     end
-    collection {post :import}
+    collection { post :import }
   end
-  
+
   resources :bases do
     member do
       patch 'update_type'
     end
   end
-  
 end

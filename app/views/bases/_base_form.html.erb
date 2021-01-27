@@ -10,5 +10,5 @@
   <%= f.select(:type, [["出勤", "出勤"], ["退勤", "退勤"]], {include_blank: "選択して下さい"}, class: 'form-control') %>
 
   <%= f.submit yield(:button_text), class: "btn btn-primary btn-block btn-#{yield(:class_text)}" %>
-  
+
 <% end %>

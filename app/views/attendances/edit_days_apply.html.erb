@@ -18,7 +18,7 @@
             <th>申請状況</th>
           </tr>
         </thead>
-        
+
         <tbody>
           <% @attendances.each do |day| %>
           <% day_applying_superior = User.find_by(id: day.edit_day_request_superior) %>

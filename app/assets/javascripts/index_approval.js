@@ -2,16 +2,16 @@
 $(document).on('turbolinks:load', function(){
 
   $('#year').on('change', function(){
-    
+
     $('#month').removeAttr('disabled');
-  
+
     $('#month').html('');
-    
+
     var year = $(this).val();
     const user = $(this).data('user');
-    
+
     console.log(year);
-    
+
     if(year == ""){
       $('#month').attr('disabled', 'disabled');
     }else{
@@ -26,7 +26,7 @@ $(document).on('turbolinks:load', function(){
           },
     dataType: 'json'
     })
-    
+
     .done(function(datas){
       if (datas.length !== 0){
         var option;
@@ -36,7 +36,7 @@ $(document).on('turbolinks:load', function(){
         });
       }
     })
-    
+
     .fail(function(){
       alert('月データの取得に失敗しました。再読み込みしてください。');
     });

@@ -17,7 +17,7 @@
           <th>拠点種類変更</th>
         </tr>
       </thead>
-      
+
       <tbody>
         <% @bases.each do |base| %>
           <tr>
@@ -29,7 +29,7 @@
             <td><%= base.name %></td>
             <td><%= base.type %></td>
             <td>
-              <% if base.type.blank? || base.type == "退勤" %> 
+              <% if base.type.blank? || base.type == "退勤" %>
                 <% base_btn_text = base_state(base) %>
                 <%= link_to "#{base_btn_text}登録", update_type_basis_path(base), method: :patch, class: "btn btn-primary btn-attendance" %>
               <% elsif base.type == "出勤" %>
@@ -41,7 +41,7 @@
         <% end %>
       </tbody>
     </table>
-    
+
     <div class="col-md-12 bg-abb-base-button">
       <%= link_to "拠点情報追加", new_basis_path, class: "btn btn-primary" %>
     </div>

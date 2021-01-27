@@ -16,10 +16,10 @@
         <%= f.submit  "CSVをインポート", class: "btn btn-primary csv-import" %>
       <% end %>
     </div>
-    
+
     <div class="col-md-4">
     </div>
-    
+
     <div class="col-md-4">
       <p>ユーザー名検索</p>
       <%= form_with url: users_path, method: :get, local: true do |form| %>
@@ -43,7 +43,7 @@
                 <%= user.name %>
               <%# end %>
             </div>
-          
+
             <% if current_user.admin? && !current_user?(user) %>
               <div class="col-md-11 col-md-offset-1">
                 <a style="color: black;">|<a>

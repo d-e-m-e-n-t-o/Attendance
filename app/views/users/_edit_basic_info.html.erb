@@ -1,48 +1,48 @@
 <%= form_with(model: @user, url: update_basic_info_user_path(@user), local: true, method: :patch) do |f| %>
   <%= render 'shared/error_messages', object: @user %>
-  
+
   <%= f.label :name, class: "label-#{yield(:class_text)}" %>
-  
+
   <label class="radio_button_edit">上長権限</label>
   <%= f.radio_button :superior, :true, id: "superior_true" %>
   <%= f.label :superior, "有", value: true, for: "superior_true" %>
-  
+
   <%= f.radio_button :superior, :false, id: "superior_false" %>
   <%= f.label :superior, "無", value: false, for: "superior_false" %>
-  
+
   <label class="radio_button_edit">管理者権限</label>
   <%= f.radio_button :admin, :true %>
   <%= f.label :admin_true, "有", value: true %>
-  
+
   <%= f.radio_button :admin, :false %>
   <%= f.label :admin_false, "無", value: false %>
-  
+
   <%= f.text_field :name, class: "form-control" %>
-  
+
   <%= f.label :email, class: "label-#{yield(:class_text)}" %>
   <%= f.email_field :email, class: "form-control" %>
-  
+
   <%= f.label :affiliation, class: "label-#{yield(:class_text)}" %>
   <%= f.text_field :affiliation, class: "form-control" %>
-  
+
   <%= f.label :employee_number, class: "label-#{yield(:class_text)}" %>
   <%= f.text_field :employee_number, class: "form-control" %>
-  
+
   <%= f.label :uid, class: "label-#{yield(:class_text)}" %>
   <%= f.text_field :uid, class: "form-control" %>
-  
+
   <%= f.label :password, class: "label-#{yield(:class_text)}" %>
   <%= f.password_field :password, class: "form-control" %>
-  
+
   <%= f.label :basic_work_time, class: "label-#{yield(:class_text)}" %>
   <%= f.time_field :basic_work_time, class: "form-control" %>
-  
+
   <%= f.label :designated_work_start_time, class: "label-#{yield(:class_text)}" %>
   <%= f.time_field :designated_work_start_time, class: "form-control" %>
-  
+
   <%= f.label :designated_work_end_time, class: "label-#{yield(:class_text)}" %>
   <%= f.time_field :designated_work_end_time, class: "form-control" %>
-  
+
   <div class="center">
     <div class= "col-md-12">
         <%= f.submit yield(:button_text), class: "btn btn-primary btn-#{yield(:class_text)}" %>
@@ -50,4 +50,3 @@
     </div>
   </div>
 <% end %>
-  
