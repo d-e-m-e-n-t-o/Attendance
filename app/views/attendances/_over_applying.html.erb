@@ -38,7 +38,7 @@
                         <%= render 'shared/error_messages', object: @user %>
                         <td><%= l(item.worked_on, format: :short) %></td>
                         <td class='<%= "wday#{item.worked_on.wday}"%>'>
-                          <%= $days_of_the_week[item.worked_on.wday] %>
+                          <%= ApplicationHelper.weeks[item.worked_on.wday] %>
                         </td>
                         <td><%= l(item.over_end_at, format: :time) if item.over_end_at.present? %></td>
                         <% if item.edit_day_finished_at.present? && item.edit_day_request_status == "承認" %>

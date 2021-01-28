@@ -60,7 +60,7 @@
               <td><%= day.worked_on.year %></td>
               <td><%= l(day.worked_on, format: :short) %></td>
               <td class='<%= "wday#{day.worked_on.wday}"%>'>
-                <%= $days_of_the_week[day.worked_on.wday] %>
+                <%= ApplicationHelper.weeks[day.worked_on.wday] %>
               </td>
               <td><%= l(day.before_started_at, format: :time) if day.before_started_at.present? %></td>
               <td><%= l(day.before_finished_at, format: :time) if day.before_finished_at.present? %></td>
@@ -101,7 +101,7 @@
               <td><%= over.worked_on.year %></td>
               <td><%= l(over.worked_on, format: :short) %></td>
               <td class='<%= "wday#{over.worked_on.wday}"%>'>
-                <%= $days_of_the_week[over.worked_on.wday] %>
+                <%= ApplicationHelper.weeks[over.worked_on.wday] %>
               </td>
               <td><%= l(over.over_end_at, format: :time) if over.over_end_at.present? %></td>
               <td><%= over.over_note if over.over_note.present? %></td>

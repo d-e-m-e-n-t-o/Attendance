@@ -98,34 +98,32 @@ class Attendance < ApplicationRecord
   validate :over_apply_compare_verify_time_check_finished_at_nil_edit_day_request_status_approval
 
   def over_apply_compare_verify_time_check_finished_at_nil_edit_day_request_status_approval
-    if over_request_status == '申請中' && over_end_at.present? && over_request_superior.present? && finished_at.nil? && edit_day_request_status == '承認'
+    return unless over_request_status == '申請中' && over_end_at.present? && over_request_superior.present? && finished_at.nil? && edit_day_request_status == '承認'
+
       if over_next_day == false
-        errors.add(:over_next_day, 'のチェックが不要、または必要な申請があります。') if edit_day_finished_at.change(year: Date.current.year,
-                                                                                             month: Date.current.month, day: Date.current.day) > over_end_at || edit_day_finished_at.change(
-                                                                                               year: Date.current.year, month: Date.current.month, day: Date.current.day
-                                                                                             ) == over_end_at
+        if edit_day_finished_at.change(year: Date.current.year, month: Date.current.month, day: Date.current.day) > over_end_at ||
+           edit_day_finished_at.change(year: Date.current.year, month: Date.current.month, day: Date.current.day) == over_end_at
+          errors.add(:over_next_day, 'のチェックが不要、または必要な申請があります。')
+        end
       elsif over_next_day == true
-        errors.add(:over_next_day, 'のチェックが不要、または必要な申請があります。') if edit_day_finished_at.change(year: Date.current.year,
-                                                                                             month: Date.current.month, day: Date.current.day) < over_end_at
+        if edit_day_finished_at.change(year: Date.current.year, month: Date.current.month, day: Date.current.day) < over_end_at
+          errors.add(:over_next_day, 'のチェックが不要、または必要な申請があります。')
+        end
       end
-    end
   end
 
   # 残業申請をする場合の時間比較と翌日チェックを検証(finished_atが存在)
   validate :over_apply_compare_verify_time_check_finished_at_present
 
   def over_apply_compare_verify_time_check_finished_at_present
-    if over_request_status == '申請中' && over_end_at.present? && over_request_superior.present? && finished_at.present?
-      if over_next_day == false && (finished_at.change(year: Date.current.year,
-                                                       month: Date.current.month, day: Date.current.day) > over_end_at || finished_at.change(year: Date.current.year,
-                                                                                                                                             month: Date.current.month, day: Date.current.day) == over_end_at)
-        errors.add(:over_next_day, 'のチェックが不要、または必要な申請があります。')
-      end
-      if over_next_day == true && (finished_at.change(year: Date.current.year,
-                                                      month: Date.current.month, day: Date.current.day) < over_end_at)
-        errors.add(:over_next_day, 'のチェックが不要、または必要な申請があります。')
-      end
+    return unless over_request_status == '申請中' && over_end_at.present? && over_request_superior.present? && finished_at.present?
+
+    if over_next_day == false && (finished_at.change(year: Date.current.year, month: Date.current.month, day: Date.current.day) > over_end_at || finished_at.change(year: Date.current.year, month: Date.current.month, day: Date.current.day) == over_end_at)
+      errors.add(:over_next_day, 'のチェックが不要、または必要な申請があります。')
     end
+    return unless over_next_day == true && (finished_at.change(year: Date.current.year, month: Date.current.month, day: Date.current.day) < over_end_at)
+
+    errors.add(:over_next_day, 'のチェックが不要、または必要な申請があります。')
   end
 
   # ↓ update_over_request_status_validates ↓
@@ -136,8 +134,8 @@ class Attendance < ApplicationRecord
   validate :change_over_apllying_check_required
 
   def change_over_apllying_check_required
-    if over_check_confirm == false && over_request_status != '申請中'
-      errors.add(:over_check_confirm, 'のチェックがされていない申請があります。')
-    end
+    return unless over_check_confirm == false && over_request_status != '申請中'
+
+    errors.add(:over_check_confirm, 'のチェックがされていない申請があります。')
   end
 end

@@ -17,17 +17,17 @@ class AttendancesController < ApplicationController
                 only: %i[edit_days_applying update_edit_days_applying over_applying update_over_applying]
 
   # ↓ 出勤登録 ↓
-  UPDATE_ERROR_MSG = '勤怠登録に失敗しました。やり直してください。'
+  UPDATE_ERROR_MSG = '勤怠登録に失敗しました。やり直してください。'.freeze
 
   def update
     if @attendance.started_at.nil?
-      if @attendance.update_attributes(started_at: Time.current.change(sec: 0))
+      if @attendance.update(started_at: Time.current.change(sec: 0))
         flash[:info] = 'おはようございます！'
       else
         flash[:danger] = UPDATE_ERROR_MSG
       end
     elsif @attendance.finished_at.nil?
-      if @attendance.update_attributes(finished_at: Time.current.change(sec: 0))
+      if @attendance.update(finished_at: Time.current.change(sec: 0))
         flash[:info] = 'お疲れ様でした。'
       else
         flash[:danger] = UPDATE_ERROR_MSG
@@ -73,7 +73,7 @@ class AttendancesController < ApplicationController
               "#{l(attendance.worked_on,
                    format: :long)}の勤怠変更申請は失敗しました。翌日のチェックが不要です。"
           end
-        elsif attendance.update_attributes(item)
+        elsif attendance.update(item)
           flash.delete(:info)
           if item[:edit_day_request_status] == '申請中' && flash[:danger].blank? && flash[:warning].blank?
             flash[:success] =
@@ -82,7 +82,7 @@ class AttendancesController < ApplicationController
         end
       end
       if attendance.started_at.present? && attendance.finished_at.present? && attendance.before_started_at.blank? && attendance.before_finished_at.blank?
-        attendance.update_attributes(before_started_at: attendance.started_at, before_finished_at: attendance.finished_at)
+        attendance.update(before_started_at: attendance.started_at, before_finished_at: attendance.finished_at)
       end
     end
     redirect_to attendances_edit_days_apply_user_path(@user, date: params[:date])
@@ -90,10 +90,10 @@ class AttendancesController < ApplicationController
 
   def destroy_edit_days_apply
     if @attendance.edit_day_request_status == '申請中'
-      @attendance.update_attributes(edit_day_started_at: nil, edit_day_finished_at: nil, edit_next_day: nil,
-                                    day_note: nil, edit_day_request_superior: nil, edit_day_request_status: 'なし',
-                                    edit_day_check_confirm: nil, started_at: @attendance.before_started_at,
-                                    finished_at: @attendance.before_finished_at)
+      @attendance.update(edit_day_started_at: nil, edit_day_finished_at: nil, edit_next_day: nil,
+                         day_note: nil, edit_day_request_superior: nil, edit_day_request_status: 'なし',
+                         edit_day_check_confirm: nil, started_at: @attendance.before_started_at,
+                         inished_at: @attendance.before_finished_at)
       flash[:success] = '勤怠変更申請を取り消しました。'
     else
       flash[:danger] = '上長より申請が取り消されました。' if @attendance.edit_day_request_status == 'なし'
@@ -110,7 +110,7 @@ class AttendancesController < ApplicationController
   # ↓ 勤怠申請承認 ↓
   def edit_days_applying
     @edit_days_applying = Attendance.where(edit_day_request_superior: @user.id,
-                                          edit_day_request_status: '申請中').order(:user_id).group_by(&:user_id)
+                                           edit_day_request_status: '申請中').order(:user_id).group_by(&:user_id)
     @first_day = params[:date]
   end
 
@@ -119,11 +119,11 @@ class AttendancesController < ApplicationController
       attendance = Attendance.find(id)
       if item[:edit_day_request_status].present? && item[:edit_day_request_status] != '申請中' && item[:edit_day_check_confirm] == '1'
         if item[:edit_day_request_status] == 'なし'
-          attendance.update_attributes(edit_day_started_at: nil, edit_day_finished_at: nil, edit_next_day: nil,
-                                       day_note: nil, edit_day_request_status: 'なし', edit_day_check_confirm: '1',
-                                       edit_approval_day: nil)
+          attendance.update(edit_day_started_at: nil, edit_day_finished_at: nil, edit_next_day: nil,
+                            day_note: nil, edit_day_request_status: 'なし', edit_day_check_confirm: '1',
+                            edit_approval_day: nil)
         end
-        attendance.update_attributes(item)
+        attendance.update(item)
         flash.delete(:info)
         flash[:success] = '勤怠の申請状態を変更しました。'
       elsif item[:edit_day_request_status].blank? && item[:edit_day_check_confirm] == '0'
@@ -184,7 +184,7 @@ class AttendancesController < ApplicationController
             "#{l(@attendance.worked_on,
                  format: :long)}の残業申請に失敗しました。翌日のチェックが不要です。"
         end
-      elsif @attendance.update_attributes(over_params)
+      elsif @attendance.update(over_params)
         flash.delete(:info)
         if over_params[:over_request_status] == '申請中' && flash[:danger].blank? && flash[:warning].blank?
           flash[:success] =
@@ -197,8 +197,8 @@ class AttendancesController < ApplicationController
 
   def destroy_over_apply
     if @attendance.over_request_status == '申請中'
-      @attendance.update_attributes(over_end_at: nil, over_next_day: nil, over_note: nil, over_request_superior: nil,
-                                    over_request_status: 'なし', over_check_confirm: nil)
+      @attendance.update(over_end_at: nil, over_next_day: nil, over_note: nil, over_request_superior: nil,
+                         over_request_status: 'なし', over_check_confirm: nil)
       flash[:success] = '勤怠変更申請を取り消しました。'
     else
       flash[:danger] = '上長より申請が取り消されました。' if @attendance.over_request_status == 'なし'
@@ -219,10 +219,10 @@ class AttendancesController < ApplicationController
       attendance = Attendance.find(id)
       if item[:over_request_status].present? && item[:over_request_status] != '申請中' && item[:over_check_confirm] == '1'
         if item[:over_request_status] == 'なし'
-          attendance.update_attributes(over_end_at: nil, over_next_day: nil, over_note: nil, over_request_status: 'なし',
-                                       over_check_confirm: '1', over_approval_day: nil)
+          attendance.update(over_end_at: nil, over_next_day: nil, over_note: nil, over_request_status: 'なし',
+                            over_check_confirm: '1', over_approval_day: nil)
         end
-        attendance.update_attributes(item)
+        attendance.update(item)
         flash.delete(:info)
         flash[:success] = '勤怠の申請状態を変更しました。'
       elsif item[:over_request_status].blank? && item[:over_check_confirm] == '0'
@@ -342,7 +342,7 @@ class AttendancesController < ApplicationController
         attendances.each do |attendance|
           column_values = [
             l(attendance.worked_on, format: :short),
-            $days_of_the_week[attendance.worked_on.wday],
+            ApplicationHelper.weeks[attendance.worked_on.wday],
             l(attendance.started_at, format: :time, default: ' '),
             l(attendance.finished_at, format: :time, default: ' ')
           ]

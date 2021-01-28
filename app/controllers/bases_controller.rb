@@ -34,13 +34,13 @@ class BasesController < ApplicationController
 
   def update_type
     if @base.type.blank? || @base.type == '退勤'
-      if @base.update_attributes(type: '出勤')
+      if @base.update(type: '出勤')
         flash[:info] = '拠点種類を出勤に更新しました。'
       else
         flash[:danger] = '拠点種類の更新に失敗しました'
       end
     elsif @base.type == '出勤'
-      if @base.update_attributes(type: '退勤')
+      if @base.update(type: '退勤')
         flash[:info] = '拠点種類を退勤に更新しました。'
       else
         flash[:danger] = '拠点種類の更新に失敗しました'
@@ -52,7 +52,7 @@ class BasesController < ApplicationController
   def edit; end
 
   def update
-    @base.update_attributes!(base_params)
+    @base.update!(base_params)
     flash[:success] = "#{@base.name}の情報を修正しました。"
     redirect_to bases_path
   rescue ActiveRecord::RecordInvalid

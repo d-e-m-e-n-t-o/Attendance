@@ -55,7 +55,7 @@
                         <%= render 'shared/error_messages', object: @user %>
                         <td><%= l(item.worked_on, format: :short) %></td>
                         <td class='<%= "wday#{item.worked_on.wday}"%>'>
-                          <%= $days_of_the_week[item.worked_on.wday] %>
+                          <%= ApplicationHelper.weeks[item.worked_on.wday] %>
                         </td>
                         <td><%= l(item.before_started_at, format: :hour) if item.before_started_at.present? %></td>
                         <td><%= l(item.before_started_at, format: :min) if item.before_started_at.present? %></td>

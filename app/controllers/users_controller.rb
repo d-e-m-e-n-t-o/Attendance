@@ -1,10 +1,10 @@
 class UsersController < ApplicationController
   before_action :set_user_id,
-                only: %i[show edit update destroy edit_basic_info update_basic_info update_overtime_application]
+                only: %i[show edit update destroy edit_basic_info update_basic_info]
   before_action :logged_in_user,
                 only: %i[show edit update index destroy edit_basic_info update_basic_info import get_commuting_list]
   before_action :correct_user, only: %i[show edit update]
-  before_action :superior_or_correct_user, only: [:show]
+  before_action :superior_or_correct_user, only: :show
   before_action :admin_user,
                 only: %i[index destroy edit_basic_info update_basic_info import get_commuting_list]
   before_action :set_one_month, only: :show
@@ -46,7 +46,7 @@ class UsersController < ApplicationController
   def edit; end
 
   def update
-    if @user.update_attributes(user_params)
+    if @user.update(user_params)
       flash[:success] = 'ユーザー情報を更新しました。'
       redirect_to @user
     else
@@ -71,7 +71,7 @@ class UsersController < ApplicationController
   def edit_basic_info; end
 
   def update_basic_info
-    if @user.update_attributes(basic_info_params)
+    if @user.update(basic_info_params)
       flash[:success] = "#{@user.name}の基本情報を更新しました。"
     else
       flash[:danger] = "#{@user.name}の更新は失敗しました。<br>" + @user.errors.full_messages.join('<br>')

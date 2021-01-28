@@ -8,4 +8,9 @@ module ApplicationHelper
       page_name + ' | ' + base_title
     end
   end
+  class << self
+    attr_accessor :weeks
+  end
+
+  ApplicationHelper.weeks = %w[日 月 火 水 木 金 土]
 end

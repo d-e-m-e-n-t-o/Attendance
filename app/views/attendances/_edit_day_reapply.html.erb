@@ -32,7 +32,7 @@
                   <%= render 'shared/error_messages', object: @user %>
                   <td><%= l(@attendance.worked_on, format: :short) %></td>
                   <td class='<%= "wday#{@attendance.worked_on.wday}"%>'>
-                    <%= $days_of_the_week[@attendance.worked_on.wday] %>
+                    <%= ApplicationHelper.weeks[@attendance.worked_on.wday] %>
                   </td>
                   <td><%= attendance.time_field :edit_day_started_at, class: "form-control" %></td>
                   <td><%= attendance.time_field :edit_day_finished_at, class: "form-control" %></td>

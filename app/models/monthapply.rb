@@ -8,9 +8,9 @@ class Monthapply < ApplicationRecord
   validate :month_only_applying_invalid
 
   def month_only_applying_invalid
-    if month_request_superior.blank? && (month_request_status == '申請中')
-      errors.add(:edit_day_started_at, '、退勤時間、指示書確認㊞を入力し申請してください。')
-    end
+    return unless month_request_superior.blank? && (month_request_status == '申請中')
+
+    errors.add(:edit_day_started_at, '、退勤時間、指示書確認㊞を入力し申請してください。')
   end
 
   # ↓ change_month_request_status_validates ↓
@@ -22,8 +22,8 @@ class Monthapply < ApplicationRecord
   validate :change_month_apllying_check_required
 
   def change_month_apllying_check_required
-    if month_check_confirm == false && month_request_status != '申請中'
-      errors.add(:month_check_confirm, 'のチェックがされていない月があります。')
-    end
+    return unless month_check_confirm == false && month_request_status != '申請中'
+
+    errors.add(:month_check_confirm, 'のチェックがされていない月があります。')
   end
 end

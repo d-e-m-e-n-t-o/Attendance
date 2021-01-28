@@ -5,7 +5,7 @@ class User < ApplicationRecord
 
   before_save { self.email = email.downcase }
   validates :name, presence: true, length: { maximum: 50 }
-  VALID_EMAIL_REGEX = /\A[\w+\-.]+@[a-z\d\-.]+\.[a-z]+\z/i
+  VALID_EMAIL_REGEX = /\A[\w+\-.]+@[a-z\d\-.]+\.[a-z]+\z/i.freeze
   validates :email, presence: true, length: { maximum: 100 },
                     format: { with: VALID_EMAIL_REGEX },
                     uniqueness: true
@@ -37,7 +37,7 @@ class User < ApplicationRecord
   # 永久セッションの為ハッシュ化したトークンをデータベースに記憶
   def remember
     self.remember_token = User.new_token
-    update_attribute(:remember_digest, User.digest(remember_token))
+    update(:remember_digest, User.digest(remember_token))
   end
 
   # トークンがダイジェストと一致すればtrue
@@ -48,7 +48,7 @@ class User < ApplicationRecord
   end
 
   def forget
-    update_attribute(:remember_digest, nil)
+    update(:remember_digest, nil)
   end
 
   # importメソッド
@@ -56,7 +56,7 @@ class User < ApplicationRecord
     detection = CharlockHolmes::EncodingDetector.detect(File.read(file)) # 補足は下記を確認
     encoding = detection[:encoding] == 'Shift_JIS' ? 'CP932' : detection[:encoding] # 補足は下記を確認
     CSV.foreach(file, encoding: "#{encoding}:UTF-8", headers: true) do |row|
-      puts row.inspect.to_yaml # ターミナルに中身をyaml形式で出力
+      logger.debug(row.inspect.to_yaml) # logに中身をyaml形式で出力
       user = find_by(email: row[:email]) || new # emailが見つかれば、レコードを呼び出し、見つかれなければ、新しく作成
       user.attributes = row.to_hash.slice(*updatable_attributes) # CSVからデータを取得しセット
       user.save

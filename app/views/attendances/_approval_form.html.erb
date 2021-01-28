@@ -45,7 +45,7 @@
           <tr>
             <td><%= l(day.worked_on, format: :short) %></td>
             <td class='<%= "wday#{day.worked_on.wday}"%>'>
-              <%= $days_of_the_week[day.worked_on.wday] %>
+              <%= ApplicationHelper.weeks[day.worked_on.wday] %>
             </td>
             <td><%= l(day.before_started_at, format: :time) if day.before_started_at.present? %></td>
             <td><%= l(day.before_finished_at, format: :time) if day.before_finished_at.present? %></td>
