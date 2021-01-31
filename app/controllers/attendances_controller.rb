@@ -1,20 +1,16 @@
 class AttendancesController < ApplicationController
-  before_action :set_user_id,
-                only: %i[edit_days_apply update_edit_days_apply edit_days_applying over_applying update_over_applying
-                         update_index_applying index_approval update_index_approval ajax]
-  before_action :set_user_user_id,
-                only: %i[update destroy_edit_days_apply edit_day_reapply over_apply update_over_apply destroy_over_apply
-                         index]
-  before_action :set_attendance,
-                only: %i[update destroy_edit_days_apply edit_day_reapply over_apply update_over_apply
-                         destroy_over_apply]
+  before_action :set_user_id, only: %i[edit_days_apply update_edit_days_apply edit_days_applying over_applying update_over_applying
+                                       update_index_applying index_approval update_index_approval ajax]
+  before_action :set_user_user_id, only: %i[update destroy_edit_days_apply edit_day_reapply over_apply update_over_apply destroy_over_apply
+                                            index]
+  before_action :set_attendance, only: %i[update destroy_edit_days_apply edit_day_reapply over_apply update_over_apply
+                                          destroy_over_apply]
   before_action :set_one_month, only: %i[edit_days_apply index index_approval]
   before_action :logged_in_user
-  before_action :superior_or_correct_user,
-                only: %i[update edit_days_apply update_edit_days_apply destroy_edit_days_apply edit_day_reapply over_apply
-                         update_over_apply destroy_over_apply update_index_applying index index_approval update_index_approval ajax]
-  before_action :superior_user,
-                only: %i[edit_days_applying update_edit_days_applying over_applying update_over_applying]
+  before_action :superior_or_correct_user, only: %i[update edit_days_apply update_edit_days_apply destroy_edit_days_apply edit_day_reapply over_apply
+                                                    update_over_apply destroy_over_apply update_index_applying index index_approval
+                                                    update_index_approval ajax]
+  before_action :superior_user, only: %i[edit_days_applying update_edit_days_applying over_applying update_over_applying]
 
   # ↓ 出勤登録 ↓
   UPDATE_ERROR_MSG = '勤怠登録に失敗しました。やり直してください。'.freeze
@@ -46,38 +42,29 @@ class AttendancesController < ApplicationController
       attendance = Attendance.find(id)
       if item[:edit_day_started_at].blank? && item[:edit_day_finished_at].blank? && item[:edit_day_request_superior].blank?
         if item[:edit_day_request_status] == '申請中' && flash[:danger].blank? && flash[:warning].blank? && flash[:success].blank?
-          flash[:info] =
-            '出勤時間、退勤時間、指示書確認㊞を入力し申請してください。'
+          flash[:info] = '出勤時間、退勤時間、指示書確認㊞を入力し申請してください。'
         end
       elsif item[:edit_day_started_at].blank? || item[:edit_day_finished_at].blank? || item[:edit_day_request_superior].blank?
         flash.delete(:info)
         flash.delete(:success)
         if item[:edit_day_request_status] == '申請中'
-          flash[:danger] =
-            "#{l(attendance.worked_on,
-                 format: :long)}の勤怠変更申請は失敗しました。出勤時間 、退勤時間、指示書確認㊞の全てが必要です。"
+          flash[:danger] = "#{l(attendance.worked_on, format: :long)}の勤怠変更申請は失敗しました。出勤時間 、退勤時間、指示書確認㊞の全てが必要です。"
         end
       end
       if item[:edit_day_started_at].present? && item[:edit_day_finished_at].present? && item[:edit_day_request_superior].present?
-        if compare_verify_edit_apply_time?(id, item[:edit_day_started_at], item[:edit_day_finished_at],
-                                           item[:edit_next_day])
+        if compare_verify_edit_apply_time?(id, item[:edit_day_started_at], item[:edit_day_finished_at], item[:edit_next_day])
           flash.delete(:info)
           flash.delete(:success)
           if item[:edit_day_request_status] == '申請中' && item[:edit_next_day] == '0'
-            flash[:warning] =
-              "#{l(attendance.worked_on,
-                   format: :long)}の勤怠変更申請は失敗しました。翌日のチェックが必要です。"
+            flash[:warning] = "#{l(attendance.worked_on, format: :long)}の勤怠変更申請は失敗しました。翌日のチェックが必要です。"
           end
           if item[:edit_day_request_status] == '申請中' && item[:edit_next_day] == '1'
-            flash[:warning] =
-              "#{l(attendance.worked_on,
-                   format: :long)}の勤怠変更申請は失敗しました。翌日のチェックが不要です。"
+            flash[:warning] = "#{l(attendance.worked_on, format: :long)}の勤怠変更申請は失敗しました。翌日のチェックが不要です。"
           end
         elsif attendance.update(item)
           flash.delete(:info)
           if item[:edit_day_request_status] == '申請中' && flash[:danger].blank? && flash[:warning].blank?
-            flash[:success] =
-              '勤怠変更を申請しました。'
+            flash[:success] = '勤怠変更を申請しました。'
           end
         end
       end
@@ -90,9 +77,8 @@ class AttendancesController < ApplicationController
 
   def destroy_edit_days_apply
     if @attendance.edit_day_request_status == '申請中'
-      @attendance.update(edit_day_started_at: nil, edit_day_finished_at: nil, edit_next_day: nil,
-                         day_note: nil, edit_day_request_superior: nil, edit_day_request_status: 'なし',
-                         edit_day_check_confirm: nil, started_at: @attendance.before_started_at,
+      @attendance.update(edit_day_started_at: nil, edit_day_finished_at: nil, edit_next_day: nil, day_note: nil, edit_day_request_superior: nil,
+                         edit_day_request_status: 'なし', edit_day_check_confirm: nil, started_at: @attendance.before_started_at,
                          inished_at: @attendance.before_finished_at)
       flash[:success] = '勤怠変更申請を取り消しました。'
     else
@@ -109,8 +95,7 @@ class AttendancesController < ApplicationController
 
   # ↓ 勤怠申請承認 ↓
   def edit_days_applying
-    @edit_days_applying = Attendance.where(edit_day_request_superior: @user.id,
-                                           edit_day_request_status: '申請中').order(:user_id).group_by(&:user_id)
+    @edit_days_applying = Attendance.where(edit_day_request_superior: @user.id, edit_day_request_status: '申請中').order(:user_id).group_by(&:user_id)
     @first_day = params[:date]
   end
 
@@ -119,28 +104,22 @@ class AttendancesController < ApplicationController
       attendance = Attendance.find(id)
       if item[:edit_day_request_status].present? && item[:edit_day_request_status] != '申請中' && item[:edit_day_check_confirm] == '1'
         if item[:edit_day_request_status] == 'なし'
-          attendance.update(edit_day_started_at: nil, edit_day_finished_at: nil, edit_next_day: nil,
-                            day_note: nil, edit_day_request_status: 'なし', edit_day_check_confirm: '1',
-                            edit_approval_day: nil)
+          attendance.update(edit_day_started_at: nil, edit_day_finished_at: nil, edit_next_day: nil, day_note: nil, edit_day_request_status: 'なし',
+                            edit_day_check_confirm: '1', edit_approval_day: nil)
         end
         attendance.update(item)
         flash.delete(:info)
         flash[:success] = '勤怠の申請状態を変更しました。'
       elsif item[:edit_day_request_status].blank? && item[:edit_day_check_confirm] == '0'
         if flash[:danger].blank? && flash[:warning].blank? && flash[:success].blank?
-          flash[:info] =
-            '申請状態を変更するには、指示書確認㊞と変更欄のチェックが必要です。'
+          flash[:info] = '申請状態を変更するには、指示書確認㊞と変更欄のチェックが必要です。'
         end
       else
         if item[:edit_day_request_status].blank? && item[:edit_day_check_confirm] == '1'
-          flash[:danger] =
-            "#{l(attendance.worked_on,
-                 format: :long)}の申請状態変更に失敗しました。指示者確認㊞が必要です。"
+          flash[:danger] = "#{l(attendance.worked_on, format: :long)}の申請状態変更に失敗しました。指示者確認㊞が必要です。"
         end
         if item[:edit_day_request_status] != '申請中' && item[:edit_day_check_confirm] == '0'
-          flash[:warning] =
-            "#{l(attendance.worked_on,
-                 format: :long)}の申請状態変更に失敗しました。変更欄のチェックが必要です。"
+          flash[:warning] = "#{l(attendance.worked_on, format: :long)}の申請状態変更に失敗しました。変更欄のチェックが必要です。"
         end
         flash.delete(:info) if flash[:danger].present? || flash[:warning].present?
         flash.delete(:success) if flash[:danger].present? || flash[:warning].present?
@@ -158,16 +137,14 @@ class AttendancesController < ApplicationController
     @first_day = @attendance.worked_on.beginning_of_month
     if over_params[:over_end_at].blank? && over_params[:over_request_superior].blank?
       if over_params[:over_request_status] == '申請中' && flash[:danger].blank? && flash[:warning].blank? && flash[:success].blank?
-        flash[:info] =
-          '終了予定時間、指示書確認㊞を入力し申請してください。'
+        flash[:info] = '終了予定時間、指示書確認㊞を入力し申請してください。'
       end
     elsif over_params[:over_end_at].blank? || over_params[:over_request_superior].blank?
       flash.delete(:info)
       flash.delete(:success)
       if over_params[:over_request_status] == '申請中'
         flash[:danger] =
-          "#{l(@attendance.worked_on,
-               format: :long)}の残業申請に失敗しました。終了予定時間、業務処理内容、指示書確認㊞、の全てが必要です。"
+          "#{l(@attendance.worked_on, format: :long)}の残業申請に失敗しました。終了予定時間、業務処理内容、指示書確認㊞、の全てが必要です。"
       end
     end
     if over_params[:over_end_at].present? && over_params[:over_request_superior].present?
@@ -175,20 +152,16 @@ class AttendancesController < ApplicationController
         flash.delete(:info)
         flash.delete(:success)
         if over_params[:over_request_status] == '申請中' && over_params[:over_next_day] == '0'
-          flash[:warning] =
-            "#{l(@attendance.worked_on,
-                 format: :long)}の残業申請に失敗しました。翌日のチェックが必要です。"
+          flash[:warning] = "#{l(@attendance.worked_on, format: :long)}の残業申請に失敗しました。翌日のチェックが必要です。"
         end
         if over_params[:over_request_status] == '申請中' && over_params[:over_next_day] == '1'
           flash[:warning] =
-            "#{l(@attendance.worked_on,
-                 format: :long)}の残業申請に失敗しました。翌日のチェックが不要です。"
+            "#{l(@attendance.worked_on, format: :long)}の残業申請に失敗しました。翌日のチェックが不要です。"
         end
       elsif @attendance.update(over_params)
         flash.delete(:info)
         if over_params[:over_request_status] == '申請中' && flash[:danger].blank? && flash[:warning].blank?
-          flash[:success] =
-            '残業を申請しました。'
+          flash[:success] = '残業を申請しました。'
         end
       end
     end
@@ -197,8 +170,8 @@ class AttendancesController < ApplicationController
 
   def destroy_over_apply
     if @attendance.over_request_status == '申請中'
-      @attendance.update(over_end_at: nil, over_next_day: nil, over_note: nil, over_request_superior: nil,
-                         over_request_status: 'なし', over_check_confirm: nil)
+      @attendance.update(over_end_at: nil, over_next_day: nil, over_note: nil, over_request_superior: nil, over_request_status: 'なし',
+                         over_check_confirm: nil)
       flash[:success] = '勤怠変更申請を取り消しました。'
     else
       flash[:danger] = '上長より申請が取り消されました。' if @attendance.over_request_status == 'なし'
@@ -209,8 +182,7 @@ class AttendancesController < ApplicationController
 
   # ↓ 残業申請承認 ↓
   def over_applying
-    @over_applying = Attendance.where(over_request_superior: @user.id,
-                                      over_request_status: '申請中').order(:user_id).group_by(&:user_id)
+    @over_applying = Attendance.where(over_request_superior: @user.id, over_request_status: '申請中').order(:user_id).group_by(&:user_id)
     @first_day = params[:date]
   end
 
@@ -219,27 +191,22 @@ class AttendancesController < ApplicationController
       attendance = Attendance.find(id)
       if item[:over_request_status].present? && item[:over_request_status] != '申請中' && item[:over_check_confirm] == '1'
         if item[:over_request_status] == 'なし'
-          attendance.update(over_end_at: nil, over_next_day: nil, over_note: nil, over_request_status: 'なし',
-                            over_check_confirm: '1', over_approval_day: nil)
+          attendance.update(over_end_at: nil, over_next_day: nil, over_note: nil, over_request_status: 'なし', over_check_confirm: '1',
+                            over_approval_day: nil)
         end
         attendance.update(item)
         flash.delete(:info)
         flash[:success] = '勤怠の申請状態を変更しました。'
       elsif item[:over_request_status].blank? && item[:over_check_confirm] == '0'
         if flash[:danger].blank? && flash[:warning].blank? && flash[:success].blank?
-          flash[:info] =
-            '申請状態を変更するには、指示書確認㊞と変更欄のチェックが必要です。'
+          flash[:info] = '申請状態を変更するには、指示書確認㊞と変更欄のチェックが必要です。'
         end
       else
         if item[:over_request_status].blank? && item[:over_check_confirm] == '1'
-          flash[:danger] =
-            "#{l(attendance.worked_on,
-                 format: :long)}の申請状態変更に失敗しました。指示者確認㊞が必要です。"
+          flash[:danger] = "#{l(attendance.worked_on, format: :long)}の申請状態変更に失敗しました。指示者確認㊞が必要です。"
         end
         if item[:over_request_status] != '申請中' && item[:over_check_confirm] == '0'
-          flash[:warning] =
-            "#{l(attendance.worked_on,
-                 format: :long)}の申請状態変更に失敗しました。変更欄のチェックが必要です。"
+          flash[:warning] = "#{l(attendance.worked_on, format: :long)}の申請状態変更に失敗しました。変更欄のチェックが必要です。"
         end
         flash.delete(:info) if flash[:danger].present? || flash[:warning].present?
         flash.delete(:success) if flash[:danger].present? || flash[:warning].present?
@@ -271,32 +238,26 @@ class AttendancesController < ApplicationController
 
   # ↓ 勤怠ログ ↓
   def index_approval
-    attendances_approved = @user.attendances.where('(edit_day_request_status = ?) OR (over_request_status = ?)', '承認',
-                                                   '承認')
-    @years = attendances_approved.pluck(:worked_on).map { |day| day.year }.uniq
+    attendances_approved = @user.attendances.where('(edit_day_request_status = ?) OR (over_request_status = ?)', '承認', '承認')
+    @years = attendances_approved.pluck(:worked_on).map(&:year).uniq
   end
 
   def update_index_approval
-    attendances_approved = @user.attendances.where('(edit_day_request_status = ?) OR (over_request_status = ?)', '承認',
-                                                   '承認')
-    @years = attendances_approved.pluck(:worked_on).map { |day| day.year }.uniq
+    attendances_approved = @user.attendances.where('(edit_day_request_status = ?) OR (over_request_status = ?)', '承認', '承認')
+    @years = attendances_approved.pluck(:worked_on).map(&:year).uniq
     @first_day = Date.parse("#{params[:year]}/#{params[:month]}/1")
     @last_day = @first_day.end_of_month
-    @attendances_approved = @user.attendances.where(worked_on: @first_day..@last_day).where(
-      '(edit_day_request_status = ?) OR (over_request_status = ?)', '承認', '承認'
-    ).order(:worked_on)
+    @attendances_approved = @user.attendances.where(worked_on: @first_day..@last_day).where('(edit_day_request_status = ?) OR (over_request_status = ?)',
+                                                                                            '承認', '承認').order(:worked_on)
     @attendances_approved = nil if params[:data] == 'リセット'
   end
 
   def ajax
     first_day = Date.parse("#{params[:year]}/1/1")
     last_day = Date.parse("#{params[:year]}/12/31")
-    attendances_approved = @user.attendances.where('(edit_day_request_status = ?) OR (over_request_status = ?)', '承認',
-                                                   '承認')
+    attendances_approved = @user.attendances.where('(edit_day_request_status = ?) OR (over_request_status = ?)', '承認', '承認')
     if params[:year].present?
-      @months = attendances_approved.where(worked_on: first_day..last_day).pluck(:worked_on).map { |day|
-        day.month
-      }.uniq
+      @months = attendances_approved.where(worked_on: first_day..last_day).pluck(:worked_on).map(&:month).uniq
     end
     # ajax通信の記述:dataTypeの種類に応じて参照するファイルを切り替える.
     # ajax記述には、dataType: 'json' と書かれているので

@@ -5,7 +5,7 @@ module ApplicationHelper
     if page_name.empty?
       base_title
     else
-      page_name + ' | ' + base_title
+      "#{page_name} | #{base_title}"
     end
   end
   class << self

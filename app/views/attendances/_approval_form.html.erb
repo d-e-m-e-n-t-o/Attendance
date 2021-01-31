@@ -1,4 +1,7 @@
 <a class="edit-day-apply-a">※勤怠が承認された年月のみ選択肢に表示されます。</a>
+<% if @years.blank? %>
+  <a class="edit-day-apply-a">※現在承認された勤怠はありません。</a>
+<% end %>
 <%= form_with(url: attendances_update_index_approval_user_path(@user), local: true, method: :get) do |f| %>
   <div class="attendances_log_item">
     <div class="form-horizontal" role="form">
@@ -22,7 +25,7 @@
       <%= link_to "リセット", attendances_index_approval_user_path(@user, data: "リセット"), class: "btn btn-default btn-#{yield(:class_text)}" %>
     </div>
   </div>
-  <%if @attendances_approved.present? %>
+  <% if @attendances_approved.present? %>
     <table class="table table-bordered table-condensed table-hover" id="table-attendances">
       <thead>
         <tr>

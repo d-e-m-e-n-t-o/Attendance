@@ -6,6 +6,9 @@ require:
 Rails:
   Enabled: true
 
+Rails/HelperInstanceVariable:
+  Enabled: false
+
 AllCops:
   # Rubyバージョン指定
   TargetRubyVersion: 2.7
@@ -170,6 +173,7 @@ Metrics/MethodLength:
 
 Metrics/ModuleLength:
   CountComments: false
+  Max: 150
 
 Naming/FileName:
   Exclude:

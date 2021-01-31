@@ -1,10 +1,8 @@
 class Base < ApplicationRecord
   self.inheritance_column = :_type_disabled # 補足は下記を確認
 
-  validates :number, presence: true, uniqueness: { message: '：入力された%<attribute>sは既に存在しています。',
-                                                   attribute: '拠点番号' }
-  validates :name, presence: true, uniqueness: { message: '：入力された%<attribute>sは既に存在しています。',
-                                                 attribute: '拠点名' }
+  validates :number, presence: true, uniqueness: { message: '：入力された%<attribute>sは既に存在しています。', attribute: '拠点番号' }
+  validates :name, presence: true, uniqueness: { message: '：入力された%<attribute>sは既に存在しています。', attribute: '拠点名' }
 end
 
 # self.inheritance_column = :_type_disabled について

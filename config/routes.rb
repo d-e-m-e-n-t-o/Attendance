@@ -22,7 +22,7 @@ Rails.application.routes.draw do
       patch 'attendances/update_edit_days_apply'
       get 'attendances/over_applying'
       patch 'attendances/update_over_applying'
-      get 'get_commuting_list'
+      get 'commuter_list'
       patch 'monthapplies/applying_update'
       get 'attendances/index_approval'
       get 'attendances/update_index_approval'

@@ -37,7 +37,7 @@ class User < ApplicationRecord
   # 永久セッションの為ハッシュ化したトークンをデータベースに記憶
   def remember
     self.remember_token = User.new_token
-    update(:remember_digest, User.digest(remember_token))
+    update(remember_digest: User.digest(remember_token))
   end
 
   # トークンがダイジェストと一致すればtrue
@@ -48,7 +48,7 @@ class User < ApplicationRecord
   end
 
   def forget
-    update(:remember_digest, nil)
+    update(remember_digest: nil)
   end
 
   # importメソッド

@@ -24,8 +24,7 @@ class MonthappliesController < ApplicationController
 
   def destroy_month_apply
     if @applying_month[:month_request_status] == '申請中'
-      @applying_month.update(month_request_superior: nil, month_request_status: 'なし',
-                             month_check_confirm: nil)
+      @applying_month.update(month_request_superior: nil, month_request_status: 'なし', month_check_confirm: nil)
       flash[:success] = "#{@applying_month.month_first_day.month}月の申請を取り消しました。"
     else
       flash[:danger] = '上長より申請が取り消されました。' if @applying_month.month_request_status == 'なし'
@@ -36,8 +35,7 @@ class MonthappliesController < ApplicationController
 
   # ↓勤怠承認 ↓
   def edit
-    @month_applying = Monthapply.where(month_request_superior: @user.id,
-                                       month_request_status: '申請中').order(:user_id).group_by(&:user_id)
+    @month_applying = Monthapply.where(month_request_superior: @user.id, month_request_status: '申請中').order(:user_id).group_by(&:user_id)
     @first_day = params[:date]
   end
 
@@ -46,25 +44,21 @@ class MonthappliesController < ApplicationController
       month = Monthapply.find(id)
       if item[:month_request_status].present? && item[:month_request_status] != '申請中' && item[:month_check_confirm] == '1'
         if item[:month_request_status] == 'なし'
-          month.update(month_request_status: 'なし',
-                       month_check_confirm: '1')
+          month.update(month_request_status: 'なし', month_check_confirm: '1')
         end
         month.update(item)
         flash.delete(:info)
         flash[:success] = '勤怠の申請状態を変更しました。'
       elsif item[:month_request_status].blank? && item[:month_check_confirm] == '0'
         if flash[:danger].blank? && flash[:warning].blank? && flash[:success].blank?
-          flash[:info] =
-            '申請状態を変更するには、指示書確認㊞と変更欄のチェックが必要です。'
+          flash[:info] = '申請状態を変更するには、指示書確認㊞と変更欄のチェックが必要です。'
         end
       else
         if item[:month_request_status].blank? && item[:month_check_confirm] == '1'
-          flash[:danger] =
-            '指示者確認㊞が選択されていない申請があります。'
+          flash[:danger] = '指示者確認㊞が選択されていない申請があります。'
         end
         if item[:month_request_status] != '申請中' && item[:month_check_confirm] == '0'
-          flash[:warning] =
-            '変更欄のチェックがされていない申請があります。'
+          flash[:warning] = '変更欄のチェックがされていない申請があります。'
         end
         flash.delete(:info) if flash[:danger].present? || flash[:warning].present?
         flash.delete(:success) if flash[:danger].present? || flash[:warning].present?

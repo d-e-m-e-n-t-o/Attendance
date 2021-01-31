@@ -2,11 +2,11 @@ class UsersController < ApplicationController
   before_action :set_user_id,
                 only: %i[show edit update destroy edit_basic_info update_basic_info]
   before_action :logged_in_user,
-                only: %i[show edit update index destroy edit_basic_info update_basic_info import get_commuting_list]
+                only: %i[show edit update index destroy edit_basic_info update_basic_info import commuter_list]
   before_action :correct_user, only: %i[show edit update]
   before_action :superior_or_correct_user, only: :show
   before_action :admin_user,
-                only: %i[index destroy edit_basic_info update_basic_info import get_commuting_list]
+                only: %i[index destroy edit_basic_info update_basic_info import commuter_list]
   before_action :set_one_month, only: :show
 
   def new
@@ -23,8 +23,7 @@ class UsersController < ApplicationController
       @applying_month_superior = User.find_by(id: @applying_month.month_request_superior)
     end
     @applying_month_count = Monthapply.where(month_request_superior: @user.id, month_request_status: '申請中').count
-    @applying_edit_day_count = Attendance.where(edit_day_request_superior: @user.id,
-                                                edit_day_request_status: '申請中').count
+    @applying_edit_day_count = Attendance.where(edit_day_request_superior: @user.id, edit_day_request_status: '申請中').count
     @applying_over_count = Attendance.where(over_request_superior: @user.id, over_request_status: '申請中').count
     @monthapplies_update_applying = @user.monthapplies.where(month_check_confirm: true)
     @edit_day_update_applying = @user.attendances.where(edit_day_check_confirm: true)
@@ -84,7 +83,7 @@ class UsersController < ApplicationController
     redirect_to users_url
   end
 
-  def get_commuting_list
+  def commuter_list
     @user_ids = Attendance.where.not(started_at: nil).where(finished_at: nil).pluck(:user_id)
     @users = User.where(id: @user_ids)
     flash.now[:danger] = '現在出勤中の社員はおりません。' if @users.blank?
@@ -93,8 +92,7 @@ class UsersController < ApplicationController
   private
 
     def user_params
-      params.require(:user).permit(:name, :email, :affiliation, :employee_number, :uid, :password,
-                                   :password_confirmation)
+      params.require(:user).permit(:name, :email, :affiliation, :employee_number, :uid, :password, :password_confirmation)
     end
 
     def basic_info_params
